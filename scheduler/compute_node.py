@@ -1,15 +1,43 @@
 class ComputeNode:
-    def __init__(self, node_id, node_type, cpu_cores, memory_gb, gpu_available):
+    def __init__(
+        self,
+        node_id,
+        node_type,
+        cpu_cores,
+        memory_gb,
+        gpu_available,
+        cpu_utilization=0.0,
+        memory_utilization=0.0,
+        gpu_utilization=0.0,
+        network_latency_ms=0.0
+    ):
         self.node_id = node_id
         self.node_type = node_type
+
+        # Fixed resources
         self.cpu_cores = cpu_cores
         self.memory_gb = memory_gb
         self.gpu_available = gpu_available
 
+        # Dynamic resource state
+        self.cpu_utilization = cpu_utilization
+        self.memory_utilization = memory_utilization
+        self.gpu_utilization = gpu_utilization
+        self.network_latency_ms = network_latency_ms
+
     def display_info(self):
         print(f"Node ID: {self.node_id}")
         print(f"Node Type: {self.node_type}")
+
         print(f"CPU Cores: {self.cpu_cores}")
+        print(f"CPU Utilization: {self.cpu_utilization}%")
+
         print(f"Memory: {self.memory_gb} GB")
+        print(f"Memory Utilization: {self.memory_utilization}%")
+
         print(f"GPU Available: {self.gpu_available}")
+        print(f"GPU Utilization: {self.gpu_utilization}%")
+
+        print(f"Network Latency: {self.network_latency_ms} ms")
+
         print("-" * 40)
