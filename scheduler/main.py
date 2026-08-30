@@ -1,4 +1,5 @@
 from compute_node import ComputeNode
+from task import Task
 
 
 edge_1 = ComputeNode(
@@ -40,6 +41,35 @@ cloud_1 = ComputeNode(
 )
 
 
+# Create workloads/tasks
+image_task = Task(
+    task_id="task-001",
+    workload_type="image_processing",
+    cpu_required=2,
+    memory_required_gb=2,
+    gpu_required=False,
+    deadline_seconds=5,
+    priority=2
+)
+
+
+video_task = Task(
+    task_id="task-002",
+    workload_type="video_processing",
+    cpu_required=4,
+    memory_required_gb=8,
+    gpu_required=True,
+    deadline_seconds=10,
+    priority=1
+)
+
+
+# Display node information
 edge_1.display_info()
 edge_2.display_info()
 cloud_1.display_info()
+
+
+# Display task information
+image_task.display_info()
+video_task.display_info()
