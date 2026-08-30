@@ -41,7 +41,6 @@ cloud_1 = ComputeNode(
 )
 
 
-# Create workloads/tasks
 image_task = Task(
     task_id="task-001",
     workload_type="image_processing",
@@ -64,15 +63,14 @@ video_task = Task(
 )
 
 
-# Display node information
 edge_1.display_info()
 edge_2.display_info()
 cloud_1.display_info()
 
 
-# Display task information
 image_task.display_info()
 video_task.display_info()
+
 
 print("Task-001 on Edge-01:", edge_1.can_run_task(image_task))
 print("Task-001 on Edge-02:", edge_2.can_run_task(image_task))
@@ -83,3 +81,16 @@ print()
 print("Task-002 on Edge-01:", edge_1.can_run_task(video_task))
 print("Task-002 on Edge-02:", edge_2.can_run_task(video_task))
 print("Task-002 on Cloud-01:", cloud_1.can_run_task(video_task))
+
+
+print()
+print("Allocating Task-001 to Edge-01...")
+
+allocated = edge_1.allocate_task(image_task)
+
+print("Allocation successful:", allocated)
+
+print()
+print("Edge-01 state after allocation:")
+
+edge_1.display_info()

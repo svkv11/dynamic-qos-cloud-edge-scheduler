@@ -43,8 +43,13 @@ class ComputeNode:
         print("-" * 40)
 
     def can_run_task(self, task):
-        available_cpu = self.cpu_cores * (1 - self.cpu_utilization / 100)
-        available_memory = self.memory_gb * (1 - self.memory_utilization / 100)
+        available_cpu = self.cpu_cores * (
+            1 - self.cpu_utilization / 100
+        )
+
+        available_memory = self.memory_gb * (
+            1 - self.memory_utilization / 100
+        )
 
         if task.cpu_required > available_cpu:
             return False
@@ -54,5 +59,25 @@ class ComputeNode:
 
         if task.gpu_required and not self.gpu_available:
             return False
+
+        return True
+
+    def allocate_task(self, task):
+        if not self.can_run_task(task):
+            return False
+
+        cpu_increase = (
+            task.cpu_required / self.cpu_cores
+        ) * 100
+
+        memory_increase = (
+            task.memory_required_gb / self.memory_gb
+        ) * 100
+
+        self.cpu_utilization += cpu_increase
+        self.memory_utilization += memory_increase
+
+        if task.gpu_required:
+            self.gpu_utilization += 25.0
 
         return True
