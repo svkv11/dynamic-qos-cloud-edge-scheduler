@@ -81,3 +81,23 @@ class ComputeNode:
             self.gpu_utilization += 25.0
 
         return True
+
+    def release_task(self, task):
+        cpu_decrease = (
+            task.cpu_required / self.cpu_cores
+        ) * 100
+
+        memory_decrease = (
+            task.memory_required_gb / self.memory_gb
+        ) * 100
+
+        self.cpu_utilization -= cpu_decrease
+        self.memory_utilization -= memory_decrease
+
+        if task.gpu_required:
+            self.gpu_utilization -= 25.0
+
+        # Prevent utilization from becoming negative
+        self.cpu_utilization = max(0.0, self.cpu_utilization)
+        self.memory_utilization = max(0.0, self.memory_utilization)
+        self.gpu_utilization = max(0.0, self.gpu_utilization)

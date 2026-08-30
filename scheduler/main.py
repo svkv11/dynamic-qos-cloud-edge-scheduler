@@ -94,3 +94,13 @@ print()
 print("Edge-01 state after allocation:")
 
 edge_1.display_info()
+
+
+print("Releasing Task-001 from Edge-01...")
+
+edge_1.release_task(image_task)
+
+print()
+print("Edge-01 state after release:")
+
+edge_1.display_info()
