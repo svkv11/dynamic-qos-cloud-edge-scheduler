@@ -41,3 +41,18 @@ class ComputeNode:
         print(f"Network Latency: {self.network_latency_ms} ms")
 
         print("-" * 40)
+
+    def can_run_task(self, task):
+        available_cpu = self.cpu_cores * (1 - self.cpu_utilization / 100)
+        available_memory = self.memory_gb * (1 - self.memory_utilization / 100)
+
+        if task.cpu_required > available_cpu:
+            return False
+
+        if task.memory_required_gb > available_memory:
+            return False
+
+        if task.gpu_required and not self.gpu_available:
+            return False
+
+        return True

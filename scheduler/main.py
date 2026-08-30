@@ -73,3 +73,13 @@ cloud_1.display_info()
 # Display task information
 image_task.display_info()
 video_task.display_info()
+
+print("Task-001 on Edge-01:", edge_1.can_run_task(image_task))
+print("Task-001 on Edge-02:", edge_2.can_run_task(image_task))
+print("Task-001 on Cloud-01:", cloud_1.can_run_task(image_task))
+
+print()
+
+print("Task-002 on Edge-01:", edge_1.can_run_task(video_task))
+print("Task-002 on Edge-02:", edge_2.can_run_task(video_task))
+print("Task-002 on Cloud-01:", cloud_1.can_run_task(video_task))
