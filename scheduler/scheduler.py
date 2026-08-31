@@ -18,3 +18,16 @@ class QoSScheduler:
         )
 
         return best_node
+
+    def schedule_task(self, task):
+        best_node = self.select_best_node(task)
+
+        if best_node is None:
+            return None
+
+        allocated = best_node.allocate_task(task)
+
+        if not allocated:
+            return None
+
+        return best_node

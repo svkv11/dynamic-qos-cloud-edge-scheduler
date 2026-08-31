@@ -74,23 +74,49 @@ nodes = [
 scheduler = QoSScheduler(nodes)
 
 
-print("Task-001 Best Node:")
+print("Initial Node States")
+print("=" * 40)
 
-best_node = scheduler.select_best_node(image_task)
+edge_1.display_info()
+edge_2.display_info()
+cloud_1.display_info()
 
-if best_node:
-    print(best_node.node_id)
+
+print("Scheduling Task-001")
+print("=" * 40)
+
+selected_node = scheduler.schedule_task(image_task)
+
+if selected_node:
+    print(f"Task-001 assigned to: {selected_node.node_id}")
 else:
-    print("No suitable node found")
+    print("Task-001 could not be scheduled")
 
 
 print()
+print("Node States After Task-001 Allocation")
+print("=" * 40)
 
-print("Task-002 Best Node:")
+edge_1.display_info()
+edge_2.display_info()
+cloud_1.display_info()
 
-best_node = scheduler.select_best_node(video_task)
 
-if best_node:
-    print(best_node.node_id)
+print("Scheduling Task-002")
+print("=" * 40)
+
+selected_node = scheduler.schedule_task(video_task)
+
+if selected_node:
+    print(f"Task-002 assigned to: {selected_node.node_id}")
 else:
-    print("No suitable node found")
+    print("Task-002 could not be scheduled")
+
+
+print()
+print("Final Node States")
+print("=" * 40)
+
+edge_1.display_info()
+edge_2.display_info()
+cloud_1.display_info()
