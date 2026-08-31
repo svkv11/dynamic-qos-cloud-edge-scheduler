@@ -84,6 +84,14 @@ print("Task-002 on Cloud-01:", cloud_1.can_run_task(video_task))
 
 
 print()
+print("QoS Scores:")
+
+print("Edge-01:", edge_1.calculate_qos_score())
+print("Edge-02:", edge_2.calculate_qos_score())
+print("Cloud-01:", cloud_1.calculate_qos_score())
+
+
+print()
 print("Allocating Task-001 to Edge-01...")
 
 allocated = edge_1.allocate_task(image_task)

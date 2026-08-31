@@ -101,3 +101,21 @@ class ComputeNode:
         self.cpu_utilization = max(0.0, self.cpu_utilization)
         self.memory_utilization = max(0.0, self.memory_utilization)
         self.gpu_utilization = max(0.0, self.gpu_utilization)
+
+    def calculate_qos_score(self):
+        cpu_score = 100 - self.cpu_utilization
+        memory_score = 100 - self.memory_utilization
+        gpu_score = 100 - self.gpu_utilization
+        latency_score = max(
+            0.0,
+            100 - self.network_latency_ms
+        )
+
+        qos_score = (
+            0.30 * cpu_score
+            + 0.25 * memory_score
+            + 0.20 * gpu_score
+            + 0.25 * latency_score
+        )
+
+        return round(qos_score, 2)
