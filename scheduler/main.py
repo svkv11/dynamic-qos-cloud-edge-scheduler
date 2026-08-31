@@ -1,5 +1,6 @@
 from compute_node import ComputeNode
 from task import Task
+from scheduler import QoSScheduler
 
 
 edge_1 = ComputeNode(
@@ -63,52 +64,33 @@ video_task = Task(
 )
 
 
-edge_1.display_info()
-edge_2.display_info()
-cloud_1.display_info()
+nodes = [
+    edge_1,
+    edge_2,
+    cloud_1
+]
 
 
-image_task.display_info()
-video_task.display_info()
+scheduler = QoSScheduler(nodes)
 
 
-print("Task-001 on Edge-01:", edge_1.can_run_task(image_task))
-print("Task-001 on Edge-02:", edge_2.can_run_task(image_task))
-print("Task-001 on Cloud-01:", cloud_1.can_run_task(image_task))
+print("Task-001 Best Node:")
 
-print()
+best_node = scheduler.select_best_node(image_task)
 
-print("Task-002 on Edge-01:", edge_1.can_run_task(video_task))
-print("Task-002 on Edge-02:", edge_2.can_run_task(video_task))
-print("Task-002 on Cloud-01:", cloud_1.can_run_task(video_task))
-
-
-print()
-print("QoS Scores:")
-
-print("Edge-01:", edge_1.calculate_qos_score())
-print("Edge-02:", edge_2.calculate_qos_score())
-print("Cloud-01:", cloud_1.calculate_qos_score())
+if best_node:
+    print(best_node.node_id)
+else:
+    print("No suitable node found")
 
 
 print()
-print("Allocating Task-001 to Edge-01...")
 
-allocated = edge_1.allocate_task(image_task)
+print("Task-002 Best Node:")
 
-print("Allocation successful:", allocated)
+best_node = scheduler.select_best_node(video_task)
 
-print()
-print("Edge-01 state after allocation:")
-
-edge_1.display_info()
-
-
-print("Releasing Task-001 from Edge-01...")
-
-edge_1.release_task(image_task)
-
-print()
-print("Edge-01 state after release:")
-
-edge_1.display_info()
+if best_node:
+    print(best_node.node_id)
+else:
+    print("No suitable node found")
