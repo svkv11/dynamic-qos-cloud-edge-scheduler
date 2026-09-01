@@ -1,275 +1,67 @@
-# Dynamic QoS Cloud-Edge Scheduler
-## Project Continuation Context
+# Dynamic QoS Cloud-Edge Scheduler - Project Context
 
-Last Updated: Day 1
-Status: Day 1 COMPLETE
+## Project Status
 
-==================================================
-1. PROJECT GOAL
-==================================================
-
-We are building a Dynamic QoS Cloud-Edge Scheduler for
-heterogeneous workloads.
-
-The system will accept workload requirements, convert them
-into QoS/resource requirements, and dynamically select the
-most suitable Edge or Cloud worker based on available
-resources and QoS requirements.
-
-The project is intended to support multiple workload types,
-not only GenAI.
-
-Examples:
-- GenAI workloads
-- Image processing
-- Video processing
-- ML inference
-- Other computational workloads
-
-The LLM is an additional layer that makes it easier for users
-to express requirements in natural language. It is NOT the
-scheduler itself.
-
-==================================================
-2. HIGH-LEVEL SYSTEM IDEA
-==================================================
-
-User
-  ↓
-LLM / Requirement Interpretation
-  ↓
-QoS Requirements
-  ↓
-Dynamic QoS Scheduler
-  ↓
-Available Edge / Cloud Workers
-  ↓
-Best Worker Selected
-  ↓
-Task Execution
-  ↓
-Monitoring + Results
-
-==================================================
-3. IMPORTANT PROJECT DECISIONS
-==================================================
-
-1. The project should NOT be limited only to GenAI workloads.
-
-2. The project should support heterogeneous workloads such as:
-   - GenAI
-   - image processing
-   - video processing
-   - ML inference
-   - other computational tasks
-
-3. The LLM is used as a front-end requirement interpretation
-   layer.
-
-4. The scheduler remains responsible for resource allocation
-   and worker selection.
-
-5. We are NOT initially using physical Edge hardware.
-
-6. Edge resources will initially be represented using
-   virtualized/simulated worker nodes.
-
-7. Development progression:
-   Python Simulator
-       ↓
-   Docker Workers
-       ↓
-   Optional/Recommended Cloud VM validation
-
-8. We will NOT create multiple cloud VMs at the beginning.
-
-9. We are developing incrementally and committing changes
-   to GitHub regularly.
-
-10. We will build and understand each component before moving
-    to the next component.
-
-==================================================
-4. DEVELOPMENT STRATEGY
-==================================================
-
-Phase 1:
-Python-based Edge/Cloud simulator
-
-Phase 2:
-Dynamic resource utilization
-
-Phase 3:
-Task/workload model
-
-Phase 4:
-QoS requirements and QoS-aware scheduling
-
-Phase 5:
-Dynamic scheduler
-
-Phase 6:
-Docker-based workers
-
-Phase 7:
-LLM requirement interpretation
-
-Phase 8:
-Heterogeneous workload execution
-
-Phase 9:
-Intelligent/RL-based scheduling improvements
-(if retained after evaluation)
-
-Phase 10:
-FastAPI/backend and dashboard
-
-Phase 11:
-Cloud deployment/validation
-
-Phase 12:
-Experiments, comparison, graphs and research evaluation
-
-==================================================
-5. CURRENT DEVELOPMENT ENVIRONMENT
-==================================================
-
-Operating system:
-Windows
-
-Project location:
-
-C:\capstone_project\dynamic-qos-cloud-edge-scheduler
-
-Python:
-3.13.5
-
-Git:
-2.55.0.windows.3
-
-Python virtual environment:
-.venv
-
-Virtual environment is activated successfully.
-
-Python executable currently being used:
-
-C:\capstone_project\dynamic-qos-cloud-edge-scheduler\.venv\Scripts\python.exe
-
-Git branch:
-main
+The project is a software-based Dynamic QoS Cloud-Edge Scheduler.
 
 GitHub repository:
+dynamic-qos-cloud-edge-scheduler
 
-https://github.com/svkv11/dynamic-qos-cloud-edge-scheduler.git
+Current branch:
+main
 
-Git status after Day 1:
-clean
+Current Git status:
+Clean
 
-==================================================
-6. CURRENT PROJECT STRUCTURE
-==================================================
+---
 
-dynamic-qos-cloud-edge-scheduler/
-│
-├── scheduler/
-│   ├── compute_node.py
-│   └── main.py
-│
-├── tests/
-│
-├── README.md
-├── .gitignore
-└── .venv/   (local only; not committed)
+## Project Goal
 
-==================================================
-7. DAY 1 COMPLETED
-==================================================
+Build a dynamic scheduler that receives heterogeneous workloads/tasks and selects the most suitable cloud or edge compute node based on:
 
-Day 1 objective:
+- CPU requirements
+- Memory requirements
+- GPU requirements
+- Current CPU utilization
+- Current memory utilization
+- Current GPU utilization
+- Network latency
+- QoS score
+- Task priority
+- Task deadline
 
-Create the first simulated Edge/Cloud computing environment.
+The long-term goal is to add an LLM-based requirement interpretation layer and support heterogeneous workloads beyond a single workload category.
+
+---
+
+# Completed Work
+
+## Day 1 - Project Setup
 
 Completed:
 
-1. Verified Python installation.
-2. Verified Git installation.
-3. Connected local project to GitHub.
-4. Created Python virtual environment.
-5. Activated .venv.
-6. Verified Python is running from .venv.
-7. Created ComputeNode class.
-8. Created three simulated computing nodes.
-9. Successfully executed the simulator.
-10. Added the project files to Git.
-11. Committed the changes.
-12. Pushed the changes to GitHub.
-13. Verified Git working tree is clean.
+- GitHub repository created
+- Python virtual environment created
+- Project folder structure created
+- Initial scheduler structure created
+- Git configured
+- README.md created
+- .gitignore created
+- docs/PROJECT_CONTEXT.md created
 
-==================================================
-8. CURRENT SIMULATED NODES
-==================================================
+---
 
-Edge-01:
+# Day 2 - Core Scheduler
 
-Node ID:
-edge-01
+## 1. ComputeNode Model
 
-Node type:
-edge
+File:
 
-CPU:
-4 cores
+scheduler/compute_node.py
 
-Memory:
-8 GB
+ComputeNode contains:
 
-GPU:
-No
-
-
-Edge-02:
-
-Node ID:
-edge-02
-
-Node type:
-edge
-
-CPU:
-8 cores
-
-Memory:
-16 GB
-
-GPU:
-Yes
-
-
-Cloud-01:
-
-Node ID:
-cloud-01
-
-Node type:
-cloud
-
-CPU:
-16 cores
-
-Memory:
-32 GB
-
-GPU:
-Yes
-
-==================================================
-9. CURRENT CODE CONCEPT
-==================================================
-
-compute_node.py currently contains a ComputeNode class.
-
-The class currently stores:
+### Fixed resources
 
 - node_id
 - node_type
@@ -277,183 +69,292 @@ The class currently stores:
 - memory_gb
 - gpu_available
 
-It also has a display_info() method.
+### Dynamic state
 
-main.py creates:
+- cpu_utilization
+- memory_utilization
+- gpu_utilization
+- network_latency_ms
 
-- edge_1
-- edge_2
-- cloud_1
+The node can:
 
-and displays their information.
+- display its current state
+- determine whether it can run a task
+- allocate task resources
+- release task resources
+- calculate a QoS score
 
-==================================================
-10. CURRENT LIMITATION
-==================================================
+---
 
-The current nodes are STATIC.
+## 2. Task / Workload Model
+
+File:
+
+scheduler/task.py
+
+Task contains:
+
+- task_id
+- workload_type
+- cpu_required
+- memory_required_gb
+- gpu_required
+- deadline_seconds
+- priority
+
+Example workloads currently tested:
+
+- image_processing
+- video_processing
+
+---
+
+## 3. Feasibility Checking
+
+The scheduler checks whether a node has sufficient resources for a task.
 
 Example:
+
+Task-002 requires GPU.
 
 Edge-01:
-CPU = 4 cores
 
-At the moment the simulator does not track:
+GPU Available = False
 
-- current CPU utilization
-- current RAM utilization
-- current GPU utilization
-- network latency
-- workload status
-- task execution
-- resource availability
-- dynamic changes over time
+Therefore:
 
-The scheduler has NOT been implemented yet.
+Task-002 on Edge-01 = False
 
-The LLM has NOT been implemented yet.
+Edge-02 and Cloud-01 are feasible.
 
-Docker has NOT been implemented yet.
+---
 
-Cloud deployment has NOT been implemented yet.
+## 4. Resource Allocation
 
-==================================================
-11. DAY 2 OBJECTIVE
-==================================================
+When a task is allocated:
 
-Next objective:
-
-Make the simulated computing nodes dynamic.
-
-We need to add concepts such as:
-
-- CPU utilization
-- RAM utilization
-- GPU utilization
-- network latency
-- availability
-- current workload
-- resource capacity
-- available resources
-
-The simulation should eventually behave approximately like:
-
-Edge-01
-CPU capacity: 4 cores
-Current CPU utilization: 72%
-
-Edge-02
-CPU capacity: 8 cores
-Current CPU utilization: 25%
-
-Cloud-01
-CPU capacity: 16 cores
-Current CPU utilization: 61%
-
-Resource values should eventually change when tasks
-start and finish.
-
-==================================================
-12. GIT WORKFLOW
-==================================================
-
-After completing each meaningful feature:
-
-1. Run the program.
-2. Test the feature.
-3. Check:
-
-   git status
-
-4. Add changes:
-
-   git add .
-
-5. Commit with a meaningful message.
+- CPU utilization increases
+- memory utilization increases
+- GPU utilization increases when applicable
 
 Example:
 
-   git commit -m "Add dynamic resource utilization"
+Edge-01 before Task-001:
 
-6. Push:
+CPU = 25%
+Memory = 30%
 
-   git push origin main
+After Task-001:
 
-7. Verify:
+CPU = 75%
+Memory = 55%
 
-   git status
+---
 
-Expected:
+## 5. Resource Release
 
-   nothing to commit, working tree clean
+Allocated resources can be released.
 
-Do NOT commit the .venv directory.
+Example:
 
-==================================================
-13. DAILY DEVELOPMENT RULE
-==================================================
+Edge-01 after Task-001 allocation:
 
-For every development session:
+CPU = 75%
+Memory = 55%
 
-1. Explain what we are building.
-2. Explain why it is needed.
-3. Create/change only the necessary files.
-4. Give exact commands/code.
-5. Run and test the code.
-6. Explain the output.
-7. Commit to GitHub.
-8. Update this project context.
-9. Provide a Chat Continuation Summary.
+After release:
 
-==================================================
-14. IMPORTANT INSTRUCTION FOR CONTINUATION
-==================================================
+CPU = 25%
+Memory = 30%
 
-If this project is continued in a NEW ChatGPT conversation,
-use this file/context as the source of the current project
-state.
+---
 
-Do NOT restart the project from the beginning.
+## 6. QoS Scoring
 
-Current progress:
+The system currently calculates a QoS score using:
 
-DAY 1 COMPLETE
+- CPU utilization
+- memory utilization
+- GPU utilization
+- network latency
 
-Next:
+Current test results:
 
-DAY 2 — Dynamic Resource Utilization
+Edge-01 = 82.5
+Edge-02 = 69.0
+Cloud-01 = 44.0
 
-==================================================
-15. LAST KNOWN STATE
-==================================================
+This is currently a basic QoS scoring mechanism.
 
-The simulator successfully runs using:
+It is NOT yet the final research-level task-aware QoS mechanism.
 
-python scheduler\main.py
+---
 
-Successful output includes:
+## 7. Best-Node Selection
 
-Node ID: edge-01
-Node Type: edge
-CPU Cores: 4
-Memory: 8 GB
-GPU Available: False
+File:
 
-Node ID: edge-02
-Node Type: edge
-CPU Cores: 8
-Memory: 16 GB
-GPU Available: True
+scheduler/scheduler.py
 
-Node ID: cloud-01
-Node Type: cloud
-CPU Cores: 16
-Memory: 32 GB
-GPU Available: True
+Class:
+
+QoSScheduler
+
+Method:
+
+select_best_node(task)
+
+The scheduler:
+
+1. Checks all nodes
+2. Removes infeasible nodes
+3. Calculates QoS scores
+4. Selects the node with the highest QoS score
+
+Test result:
+
+Task-001 → edge-01
+
+Task-002 → edge-02
+
+---
+
+## 8. Dynamic Multi-Task Scheduling
+
+The scheduler can now:
+
+1. Receive Task-001
+2. Select a suitable node
+3. Allocate resources
+4. Update node state
+5. Receive Task-002
+6. Re-evaluate nodes using their updated state
+7. Select another suitable node
+8. Allocate resources
+
+Verified output:
+
+Task-001 assigned to edge-01
+
+Task-002 assigned to edge-02
+
+Final state:
+
+edge-01:
+CPU = 75%
+Memory = 55%
+
+edge-02:
+CPU = 90%
+Memory = 95%
+GPU = 45%
+
+cloud-01:
+CPU = 55%
+Memory = 50%
+GPU = 35%
+
+---
+
+# Current Project Files
+
+scheduler/
+├── compute_node.py
+├── task.py
+├── scheduler.py
+└── main.py
+
+tests/
+
+docs/
+└── PROJECT_CONTEXT.md
+
+README.md
+.gitignore
+
+---
+
+# Important Development Rule
+
+The developer will provide complete replacement code for files that need modification.
+
+Do not manually insert small code fragments unless explicitly instructed.
+
+For every implementation step:
+
+1. Replace the specified file completely.
+2. Save it.
+3. Run the provided test command.
+4. Send the complete terminal output.
+5. Verify the result.
+6. Commit only after successful verification.
+
+---
+
+# Current Checkpoint
+
+Day 2 core scheduler implementation is complete.
 
 Git status:
-clean
 
-==================================================
-END OF CONTEXT
-==================================================
+nothing to commit, working tree clean
+
+The latest successfully tested functionality is dynamic multi-task scheduling.
+
+---
+
+# Next Development Stage
+
+Do NOT immediately add Docker, AWS EC2, or the LLM.
+
+The next stage is to improve the scheduler's decision-making mechanism.
+
+Planned progression:
+
+1. Improve task-aware QoS scoring
+2. Add better scheduling decision information
+3. Add more heterogeneous workload types
+4. Test scheduling under increasing load
+5. Add task execution simulation
+6. Add Docker-based worker simulation
+7. Integrate cloud/edge worker environment
+8. Add LLM requirement interpretation
+9. Connect LLM output to the Task model
+10. Perform experiments and evaluation
+
+---
+
+# Long-Term Architecture
+
+User / Application
+        |
+        v
+LLM Requirement Interpretation
+        |
+        v
+Task / Workload Model
+        |
+        v
+Dynamic QoS Scheduler
+        |
+        +-------------------+
+        |                   |
+        v                   v
+   Edge Workers        Cloud Workers
+        |                   |
+        +---------+---------+
+                  |
+                  v
+          Task Execution
+                  |
+                  v
+          Resource Updates
+                  |
+                  v
+          Scheduler Feedback
+
+The LLM should interpret workload requirements.
+
+The scheduler should remain responsible for infrastructure-aware scheduling decisions.
+
+The LLM should NOT directly replace the scheduler.
