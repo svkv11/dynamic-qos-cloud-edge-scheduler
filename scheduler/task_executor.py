@@ -1,5 +1,6 @@
 class TaskExecutor:
     def __init__(self):
+        self.active_tasks = []
         self.completed_tasks = []
 
     def estimate_execution_time(self, task, node):
@@ -36,10 +37,11 @@ class TaskExecutor:
 
         return round(execution_time, 2)
 
-    def execute_task(self, task, node):
+    def start_task(self, task, node):
         """
-        Simulate task execution and release resources
-        after completion.
+        Start a task without immediately releasing its resources.
+
+        The task remains active until complete_task() is called.
         """
 
         execution_time = self.estimate_execution_time(
@@ -47,12 +49,30 @@ class TaskExecutor:
             node
         )
 
+        task_state = {
+            "task": task,
+            "node": node,
+            "execution_time": execution_time
+        }
+
+        self.active_tasks.append(task_state)
+
+        return task_state
+
+    def complete_task(self, task_state):
+        """
+        Complete an active task and release its resources.
+        """
+
+        task = task_state["task"]
+        node = task_state["node"]
+        execution_time = task_state["execution_time"]
+
         deadline_met = (
             task.deadline_seconds is None
             or execution_time <= task.deadline_seconds
         )
 
-        # Release resources after simulated completion.
         node.release_task(task)
 
         result = {
@@ -63,6 +83,7 @@ class TaskExecutor:
             "deadline_met": deadline_met
         }
 
+        self.active_tasks.remove(task_state)
         self.completed_tasks.append(result)
 
         return result

@@ -91,13 +91,24 @@ tasks = [
 ]
 
 
-# Create the infrastructure only once.
-# Resource state will therefore change as tasks are scheduled.
+# Create infrastructure once.
 nodes = create_nodes()
 
 scheduler = QoSScheduler(nodes)
 executor = TaskExecutor()
 
+
+print("=" * 60)
+print("DYNAMIC TASK ARRIVAL SIMULATION")
+print("=" * 60)
+
+
+active_tasks = []
+
+
+# ---------------------------------------------------------
+# Phase 1: Start tasks without immediately completing them.
+# ---------------------------------------------------------
 
 for task in tasks:
 
@@ -132,21 +143,55 @@ for task in tasks:
         print("Task allocation failed.")
         continue
 
+    task_state = executor.start_task(
+        task,
+        best_node
+    )
+
+    active_tasks.append(task_state)
+
+    print()
+    print("Task Started")
+    print(f"Estimated Execution Time: {task_state['execution_time']} seconds")
+
     print()
     print("Node State After Allocation:")
 
     best_node.display_info()
 
-    result = executor.execute_task(
-        task,
-        best_node
+
+# ---------------------------------------------------------
+# Phase 2: Complete all active tasks.
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("COMPLETING ACTIVE TASKS")
+print("=" * 60)
+
+
+for task_state in active_tasks:
+
+    result = executor.complete_task(
+        task_state
     )
 
+    print()
+    print(f"Completed Task: {result['task_id']}")
+    print(f"Node: {result['node_id']}")
     print(f"Execution Time: {result['execution_time']} seconds")
     print(f"Deadline: {result['deadline_seconds']} seconds")
     print(f"Deadline Met: {result['deadline_met']}")
 
-    print()
-    print("Node State After Execution:")
 
-    best_node.display_info()
+# ---------------------------------------------------------
+# Final infrastructure state
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("FINAL NODE STATES")
+print("=" * 60)
+
+for node in nodes:
+    node.display_info()
