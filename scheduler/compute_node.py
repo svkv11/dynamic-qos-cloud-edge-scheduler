@@ -97,19 +97,113 @@ class ComputeNode:
         if task.gpu_required:
             self.gpu_utilization -= 25.0
 
-        # Prevent utilization from becoming negative
-        self.cpu_utilization = max(0.0, self.cpu_utilization)
-        self.memory_utilization = max(0.0, self.memory_utilization)
-        self.gpu_utilization = max(0.0, self.gpu_utilization)
+        self.cpu_utilization = max(
+            0.0,
+            self.cpu_utilization
+        )
 
-    def calculate_qos_score(self):
-        cpu_score = 100 - self.cpu_utilization
-        memory_score = 100 - self.memory_utilization
-        gpu_score = 100 - self.gpu_utilization
+        self.memory_utilization = max(
+            0.0,
+            self.memory_utilization
+        )
+
+        self.gpu_utilization = max(
+            0.0,
+            self.gpu_utilization
+        )
+
+    def calculate_qos_score(self, task):
+        """
+        Calculate a task-aware QoS score.
+
+        The score considers:
+        - CPU efficiency
+        - Memory efficiency
+        - GPU suitability
+        - Network latency
+
+        Feasibility is checked separately by can_run_task().
+        """
+
+        available_cpu = self.cpu_cores * (
+            1 - self.cpu_utilization / 100
+        )
+
+        available_memory = self.memory_gb * (
+            1 - self.memory_utilization / 100
+        )
+
+        # -----------------------------
+        # CPU Efficiency
+        # -----------------------------
+
+        if task.cpu_required == 0:
+            cpu_score = 100.0
+        else:
+            cpu_usage_ratio = (
+                task.cpu_required / available_cpu
+            )
+
+            cpu_score = max(
+                0.0,
+                100.0 - (
+                    abs(0.5 - cpu_usage_ratio) * 100
+                )
+            )
+
+            cpu_score = min(100.0, cpu_score)
+
+        # -----------------------------
+        # Memory Efficiency
+        # -----------------------------
+
+        if task.memory_required_gb == 0:
+            memory_score = 100.0
+        else:
+            memory_usage_ratio = (
+                task.memory_required_gb
+                / available_memory
+            )
+
+            memory_score = max(
+                0.0,
+                100.0 - (
+                    abs(0.5 - memory_usage_ratio) * 100
+                )
+            )
+
+            memory_score = min(
+                100.0,
+                memory_score
+            )
+
+        # -----------------------------
+        # GPU Suitability
+        # -----------------------------
+
+        if task.gpu_required:
+            if not self.gpu_available:
+                gpu_score = 0.0
+            else:
+                gpu_score = max(
+                    0.0,
+                    100.0 - self.gpu_utilization
+                )
+        else:
+            gpu_score = 100.0
+
+        # -----------------------------
+        # Network Latency
+        # -----------------------------
+
         latency_score = max(
             0.0,
-            100 - self.network_latency_ms
+            100.0 - self.network_latency_ms
         )
+
+        # -----------------------------
+        # Final QoS Score
+        # -----------------------------
 
         qos_score = (
             0.30 * cpu_score

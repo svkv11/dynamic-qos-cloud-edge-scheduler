@@ -1,23 +1,10 @@
-# Dynamic QoS Cloud-Edge Scheduler - Project Context
+# Dynamic QoS Cloud-Edge Scheduler
 
-## Project Status
+## Project Overview
 
-The project is a software-based Dynamic QoS Cloud-Edge Scheduler.
+Dynamic QoS Cloud-Edge Scheduler is a software-based cloud-edge scheduling system that dynamically selects the most suitable compute node for heterogeneous workloads.
 
-GitHub repository:
-dynamic-qos-cloud-edge-scheduler
-
-Current branch:
-main
-
-Current Git status:
-Clean
-
----
-
-## Project Goal
-
-Build a dynamic scheduler that receives heterogeneous workloads/tasks and selects the most suitable cloud or edge compute node based on:
+The scheduler considers:
 
 - CPU requirements
 - Memory requirements
@@ -26,335 +13,271 @@ Build a dynamic scheduler that receives heterogeneous workloads/tasks and select
 - Current memory utilization
 - Current GPU utilization
 - Network latency
-- QoS score
 - Task priority
 - Task deadline
+- QoS score
 
-The long-term goal is to add an LLM-based requirement interpretation layer and support heterogeneous workloads beyond a single workload category.
+The long-term architecture is:
 
----
+User/Application
+        ↓
+LLM Requirement Interpretation
+        ↓
+Task/Workload Model
+        ↓
+Dynamic QoS Scheduler
+        ↓
+Cloud/Edge Workers
+        ↓
+Task Execution
+        ↓
+Resource Updates
+        ↓
+Scheduler Feedback
 
-# Completed Work
 
-## Day 1 - Project Setup
+## Completed Milestones
+
+### Day 1 — Project Setup
 
 Completed:
 
 - GitHub repository created
-- Python virtual environment created
-- Project folder structure created
-- Initial scheduler structure created
-- Git configured
-- README.md created
-- .gitignore created
-- docs/PROJECT_CONTEXT.md created
+- Python virtual environment configured
+- Project structure created
+- Scheduler package created
+- Git configuration completed
+- README created
+- `.gitignore` created
+- `docs/PROJECT_CONTEXT.md` created
 
----
 
-# Day 2 - Core Scheduler
+### Day 2 — Compute Node Model
 
-## 1. ComputeNode Model
+Implemented `scheduler/compute_node.py`.
 
-File:
+The `ComputeNode` model supports:
 
-scheduler/compute_node.py
+#### Fixed Resources
 
-ComputeNode contains:
+- Node ID
+- Node type
+- CPU cores
+- Memory capacity
+- GPU availability
 
-### Fixed resources
-
-- node_id
-- node_type
-- cpu_cores
-- memory_gb
-- gpu_available
-
-### Dynamic state
-
-- cpu_utilization
-- memory_utilization
-- gpu_utilization
-- network_latency_ms
-
-The node can:
-
-- display its current state
-- determine whether it can run a task
-- allocate task resources
-- release task resources
-- calculate a QoS score
-
----
-
-## 2. Task / Workload Model
-
-File:
-
-scheduler/task.py
-
-Task contains:
-
-- task_id
-- workload_type
-- cpu_required
-- memory_required_gb
-- gpu_required
-- deadline_seconds
-- priority
-
-Example workloads currently tested:
-
-- image_processing
-- video_processing
-
----
-
-## 3. Feasibility Checking
-
-The scheduler checks whether a node has sufficient resources for a task.
-
-Example:
-
-Task-002 requires GPU.
-
-Edge-01:
-
-GPU Available = False
-
-Therefore:
-
-Task-002 on Edge-01 = False
-
-Edge-02 and Cloud-01 are feasible.
-
----
-
-## 4. Resource Allocation
-
-When a task is allocated:
-
-- CPU utilization increases
-- memory utilization increases
-- GPU utilization increases when applicable
-
-Example:
-
-Edge-01 before Task-001:
-
-CPU = 25%
-Memory = 30%
-
-After Task-001:
-
-CPU = 75%
-Memory = 55%
-
----
-
-## 5. Resource Release
-
-Allocated resources can be released.
-
-Example:
-
-Edge-01 after Task-001 allocation:
-
-CPU = 75%
-Memory = 55%
-
-After release:
-
-CPU = 25%
-Memory = 30%
-
----
-
-## 6. QoS Scoring
-
-The system currently calculates a QoS score using:
+#### Dynamic Resource State
 
 - CPU utilization
-- memory utilization
+- Memory utilization
 - GPU utilization
-- network latency
+- Network latency
 
-Current test results:
+#### Node Operations
 
-Edge-01 = 82.5
-Edge-02 = 69.0
-Cloud-01 = 44.0
+- Display node state
+- Check task feasibility
+- Allocate task resources
+- Release task resources
+- Calculate QoS score
 
-This is currently a basic QoS scoring mechanism.
 
-It is NOT yet the final research-level task-aware QoS mechanism.
+### Day 2 — Task / Workload Model
 
----
+Implemented `scheduler/task.py`.
 
-## 7. Best-Node Selection
+The `Task` model supports:
 
-File:
+- Task ID
+- Workload type
+- CPU requirement
+- Memory requirement
+- GPU requirement
+- Deadline
+- Priority
 
-scheduler/scheduler.py
+Example workload categories:
 
-Class:
+- CPU-intensive
+- Memory-intensive
+- GPU-intensive
+- Latency-sensitive
 
-QoSScheduler
 
-Method:
+### Day 2 — Basic QoS Scheduler
 
-select_best_node(task)
+Implemented `scheduler/scheduler.py`.
 
-The scheduler:
+The `QoSScheduler` supports:
 
-1. Checks all nodes
-2. Removes infeasible nodes
-3. Calculates QoS scores
-4. Selects the node with the highest QoS score
+- Feasible-node filtering
+- QoS-based node selection
+- Task allocation
+- Node ranking
 
-Test result:
 
-Task-001 → edge-01
+### Day 3 — Task-Aware QoS Scoring
 
-Task-002 → edge-02
+The scheduler was extended to include task-specific scheduling factors.
 
----
+Current scoring model:
 
-## 8. Dynamic Multi-Task Scheduling
+- 80% infrastructure/resource suitability
+- 10% task priority
+- 10% deadline urgency
 
-The scheduler can now:
+Priority mapping:
 
-1. Receive Task-001
-2. Select a suitable node
-3. Allocate resources
-4. Update node state
-5. Receive Task-002
-6. Re-evaluate nodes using their updated state
-7. Select another suitable node
-8. Allocate resources
+- Priority 1 → 20
+- Priority 2 → 40
+- Priority 3 → 60
+- Priority 4 → 80
+- Priority 5 → 100
 
-Verified output:
+Deadline urgency:
 
-Task-001 assigned to edge-01
+- No deadline → 50
+- Non-positive deadline → 100
+- Shorter deadlines receive higher urgency
+- Score is bounded between 0 and 100
 
-Task-002 assigned to edge-02
+The deadline score currently represents urgency rather than a guaranteed deadline constraint.
 
-Final state:
 
-edge-01:
-CPU = 75%
-Memory = 55%
+### Day 3 — Heterogeneous Workload Testing
 
-edge-02:
-CPU = 90%
-Memory = 95%
-GPU = 45%
+The scheduler was tested using four workload types:
 
-cloud-01:
-CPU = 55%
-Memory = 50%
-GPU = 35%
+1. CPU-intensive
+2. Memory-intensive
+3. GPU-intensive
+4. Latency-sensitive
 
----
+The tests confirmed that workload requirements affect:
 
-# Current Project Files
+- Node feasibility
+- QoS score
+- Node ranking
+- Final node selection
 
-scheduler/
-├── compute_node.py
-├── task.py
-├── scheduler.py
-└── main.py
 
-tests/
+### Day 3 — Task Execution Simulation
 
-docs/
-└── PROJECT_CONTEXT.md
+Implemented:
 
-README.md
-.gitignore
+`scheduler/task_executor.py`
 
----
+The `TaskExecutor` currently simulates task execution.
 
-# Important Development Rule
+Execution time is estimated using:
 
-The developer will provide complete replacement code for files that need modification.
+- CPU requirement
+- Memory requirement
+- GPU requirement
+- Node type
+- Network latency
 
-Do not manually insert small code fragments unless explicitly instructed.
+GPU workloads receive simulated acceleration when executed on GPU-capable nodes.
 
-For every implementation step:
+The executor also:
 
-1. Replace the specified file completely.
-2. Save it.
-3. Run the provided test command.
-4. Send the complete terminal output.
-5. Verify the result.
-6. Commit only after successful verification.
+- Calculates estimated execution time
+- Checks whether the deadline is met
+- Releases allocated resources after simulated completion
+- Records completed task information
 
----
 
-# Current Checkpoint
+## Current Execution Pipeline
 
-Day 2 core scheduler implementation is complete.
+The scheduler currently performs the following complete workflow:
 
-Git status:
+Task
+ ↓
+Feasibility Check
+ ↓
+Resource QoS Calculation
+ ↓
+Priority Score
+ ↓
+Deadline Urgency Score
+ ↓
+Final Task-Aware Score
+ ↓
+Node Ranking
+ ↓
+Best Node Selection
+ ↓
+Resource Allocation
+ ↓
+Execution Time Estimation
+ ↓
+Deadline Evaluation
+ ↓
+Resource Release
 
-nothing to commit, working tree clean
 
-The latest successfully tested functionality is dynamic multi-task scheduling.
+## Verified Execution Results
 
----
+The execution simulation has been successfully tested using four heterogeneous workloads.
 
-# Next Development Stage
+### CPU-intensive
 
-Do NOT immediately add Docker, AWS EC2, or the LLM.
+- Selected node: `edge-02`
+- Execution time: 7.8 seconds
+- Deadline: 60 seconds
+- Deadline met: Yes
 
-The next stage is to improve the scheduler's decision-making mechanism.
 
-Planned progression:
+### Memory-intensive
 
-1. Improve task-aware QoS scoring
-2. Add better scheduling decision information
-3. Add more heterogeneous workload types
-4. Test scheduling under increasing load
-5. Add task execution simulation
-6. Add Docker-based worker simulation
-7. Integrate cloud/edge worker environment
-8. Add LLM requirement interpretation
-9. Connect LLM output to the Task model
-10. Perform experiments and evaluation
+- Selected node: `edge-02`
+- Execution time: 7.8 seconds
+- Deadline: 60 seconds
+- Deadline met: Yes
 
----
 
-# Long-Term Architecture
+### GPU-intensive
 
-User / Application
-        |
-        v
-LLM Requirement Interpretation
-        |
-        v
-Task / Workload Model
-        |
-        v
-Dynamic QoS Scheduler
-        |
-        +-------------------+
-        |                   |
-        v                   v
-   Edge Workers        Cloud Workers
-        |                   |
-        +---------+---------+
-                  |
-                  v
-          Task Execution
-                  |
-                  v
-          Resource Updates
-                  |
-                  v
-          Scheduler Feedback
+- Selected node: `edge-02`
+- Execution time: 6.9 seconds
+- Deadline: 30 seconds
+- Deadline met: Yes
 
-The LLM should interpret workload requirements.
 
-The scheduler should remain responsible for infrastructure-aware scheduling decisions.
+### Latency-sensitive
 
-The LLM should NOT directly replace the scheduler.
+- Selected node: `edge-01`
+- Execution time: 3.25 seconds
+- Deadline: 5 seconds
+- Deadline met: Yes
+
+
+## Important Simulation Limitation
+
+The current task execution model is a synthetic simulation.
+
+It does not execute real workloads or wait for the estimated execution duration.
+
+The execution-time formula is currently used to model and evaluate scheduler behavior.
+
+Later stages may replace or extend this simulation with more realistic worker/task execution.
+
+
+## Current Project Files
+
+```text
+dynamic-qos-cloud-edge-scheduler/
+│
+├── scheduler/
+│   ├── __init__.py
+│   ├── compute_node.py
+│   ├── task.py
+│   ├── scheduler.py
+│   ├── task_executor.py
+│   └── main.py
+│
+├── docs/
+│   └── PROJECT_CONTEXT.md
+│
+├── README.md
+└── .gitignore

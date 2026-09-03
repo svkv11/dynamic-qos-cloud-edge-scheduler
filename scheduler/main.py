@@ -1,122 +1,134 @@
 from compute_node import ComputeNode
 from task import Task
 from scheduler import QoSScheduler
+from task_executor import TaskExecutor
 
 
-edge_1 = ComputeNode(
-    node_id="edge-01",
-    node_type="edge",
-    cpu_cores=4,
-    memory_gb=8,
-    gpu_available=False,
-    cpu_utilization=25.0,
-    memory_utilization=30.0,
-    gpu_utilization=0.0,
-    network_latency_ms=10.0
-)
+def create_nodes():
+    """
+    Create a fresh set of compute nodes.
+    """
+
+    return [
+        ComputeNode(
+            node_id="edge-01",
+            node_type="edge",
+            cpu_cores=4,
+            memory_gb=8,
+            gpu_available=False,
+            cpu_utilization=25.0,
+            memory_utilization=30.0,
+            gpu_utilization=0.0,
+            network_latency_ms=10.0
+        ),
+
+        ComputeNode(
+            node_id="edge-02",
+            node_type="edge",
+            cpu_cores=8,
+            memory_gb=16,
+            gpu_available=True,
+            cpu_utilization=40.0,
+            memory_utilization=45.0,
+            gpu_utilization=20.0,
+            network_latency_ms=15.0
+        ),
+
+        ComputeNode(
+            node_id="cloud-01",
+            node_type="cloud",
+            cpu_cores=16,
+            memory_gb=32,
+            gpu_available=True,
+            cpu_utilization=55.0,
+            memory_utilization=50.0,
+            gpu_utilization=35.0,
+            network_latency_ms=80.0
+        )
+    ]
 
 
-edge_2 = ComputeNode(
-    node_id="edge-02",
-    node_type="edge",
-    cpu_cores=8,
-    memory_gb=16,
-    gpu_available=True,
-    cpu_utilization=40.0,
-    memory_utilization=45.0,
-    gpu_utilization=20.0,
-    network_latency_ms=15.0
-)
+tasks = [
+    Task(
+        task_id="task-cpu",
+        workload_type="cpu_intensive",
+        cpu_required=3,
+        memory_required_gb=2,
+        gpu_required=False,
+        deadline_seconds=60,
+        priority=2
+    ),
 
+    Task(
+        task_id="task-memory",
+        workload_type="memory_intensive",
+        cpu_required=2,
+        memory_required_gb=6,
+        gpu_required=False,
+        deadline_seconds=60,
+        priority=2
+    ),
 
-cloud_1 = ComputeNode(
-    node_id="cloud-01",
-    node_type="cloud",
-    cpu_cores=16,
-    memory_gb=32,
-    gpu_available=True,
-    cpu_utilization=55.0,
-    memory_utilization=50.0,
-    gpu_utilization=35.0,
-    network_latency_ms=80.0
-)
+    Task(
+        task_id="task-gpu",
+        workload_type="gpu_intensive",
+        cpu_required=4,
+        memory_required_gb=8,
+        gpu_required=True,
+        deadline_seconds=30,
+        priority=3
+    ),
 
-
-image_task = Task(
-    task_id="task-001",
-    workload_type="image_processing",
-    cpu_required=2,
-    memory_required_gb=2,
-    gpu_required=False,
-    deadline_seconds=5,
-    priority=2
-)
-
-
-video_task = Task(
-    task_id="task-002",
-    workload_type="video_processing",
-    cpu_required=4,
-    memory_required_gb=8,
-    gpu_required=True,
-    deadline_seconds=10,
-    priority=1
-)
-
-
-nodes = [
-    edge_1,
-    edge_2,
-    cloud_1
+    Task(
+        task_id="task-latency",
+        workload_type="latency_sensitive",
+        cpu_required=1,
+        memory_required_gb=1,
+        gpu_required=False,
+        deadline_seconds=5,
+        priority=5
+    )
 ]
 
 
-scheduler = QoSScheduler(nodes)
+for task in tasks:
 
+    print()
+    print("=" * 60)
+    print(f"Executing: {task.task_id}")
+    print(f"Workload: {task.workload_type}")
+    print("=" * 60)
 
-print("Initial Node States")
-print("=" * 40)
+    # Every task gets the same initial infrastructure
+    nodes = create_nodes()
 
-edge_1.display_info()
-edge_2.display_info()
-cloud_1.display_info()
+    scheduler = QoSScheduler(nodes)
+    executor = TaskExecutor()
 
+    best_node = scheduler.select_best_node(task)
 
-print("Scheduling Task-001")
-print("=" * 40)
+    if best_node is None:
+        print("No feasible node available.")
+        continue
 
-selected_node = scheduler.schedule_task(image_task)
+    print(f"Selected Node: {best_node.node_id}")
 
-if selected_node:
-    print(f"Task-001 assigned to: {selected_node.node_id}")
-else:
-    print("Task-001 could not be scheduled")
+    # Allocate resources before execution.
+    allocated = best_node.allocate_task(task)
 
+    if not allocated:
+        print("Task allocation failed.")
+        continue
 
-print()
-print("Node States After Task-001 Allocation")
-print("=" * 40)
+    result = executor.execute_task(
+        task,
+        best_node
+    )
 
-edge_1.display_info()
-edge_2.display_info()
-cloud_1.display_info()
+    print(f"Execution Time: {result['execution_time']} seconds")
+    print(f"Deadline: {result['deadline_seconds']} seconds")
+    print(f"Deadline Met: {result['deadline_met']}")
 
-
-print("Scheduling Task-002")
-print("=" * 40)
-
-selected_node = scheduler.schedule_task(video_task)
-
-if selected_node:
-    print(f"Task-002 assigned to: {selected_node.node_id}")
-else:
-    print("Task-002 could not be scheduled")
-
-
-print()
-print("Final Node States")
-print("=" * 40)
-
-edge_1.display_info()
-edge_2.display_info()
-cloud_1.display_info()
+    print()
+    print("Node State After Execution:")
+    best_node.display_info()
