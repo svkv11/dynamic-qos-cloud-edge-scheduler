@@ -6,7 +6,7 @@ from task_executor import TaskExecutor
 
 def create_nodes():
     """
-    Create a fresh set of compute nodes.
+    Create the initial set of compute nodes.
     """
 
     return [
@@ -91,19 +91,31 @@ tasks = [
 ]
 
 
+# Create the infrastructure only once.
+# Resource state will therefore change as tasks are scheduled.
+nodes = create_nodes()
+
+scheduler = QoSScheduler(nodes)
+executor = TaskExecutor()
+
+
 for task in tasks:
 
     print()
     print("=" * 60)
-    print(f"Executing: {task.task_id}")
+    print(f"Task Arrival: {task.task_id}")
     print(f"Workload: {task.workload_type}")
     print("=" * 60)
 
-    # Every task gets the same initial infrastructure
-    nodes = create_nodes()
+    print("Node State Before Scheduling:")
 
-    scheduler = QoSScheduler(nodes)
-    executor = TaskExecutor()
+    for node in nodes:
+        print(
+            f"{node.node_id} | "
+            f"CPU={node.cpu_utilization:.2f}% | "
+            f"Memory={node.memory_utilization:.2f}% | "
+            f"GPU={node.gpu_utilization:.2f}%"
+        )
 
     best_node = scheduler.select_best_node(task)
 
@@ -111,14 +123,19 @@ for task in tasks:
         print("No feasible node available.")
         continue
 
+    print()
     print(f"Selected Node: {best_node.node_id}")
 
-    # Allocate resources before execution.
     allocated = best_node.allocate_task(task)
 
     if not allocated:
         print("Task allocation failed.")
         continue
+
+    print()
+    print("Node State After Allocation:")
+
+    best_node.display_info()
 
     result = executor.execute_task(
         task,
@@ -131,4 +148,5 @@ for task in tasks:
 
     print()
     print("Node State After Execution:")
+
     best_node.display_info()
