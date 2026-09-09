@@ -7,7 +7,8 @@ class Task:
         memory_required_gb,
         gpu_required=False,
         deadline_seconds=None,
-        priority=1
+        priority=1,
+        max_retries=3
     ):
         self.task_id = task_id
         self.workload_type = workload_type
@@ -20,6 +21,10 @@ class Task:
         # QoS requirements
         self.deadline_seconds = deadline_seconds
         self.priority = priority
+
+        # Retry configuration
+        self.max_retries = max(0, max_retries)
+        self.retry_count = 0
 
         # Task lifecycle
         self.state = "PENDING"
@@ -54,6 +59,23 @@ class Task:
         self.state = "FAILED"
         self.failure_reason = reason
 
+    def increment_retry(self):
+        """
+        Increment the number of scheduling retries.
+        """
+
+        self.retry_count += 1
+
+    def can_retry(self):
+        """
+        Check whether the task can be retried.
+
+        Returns True while the retry limit has not
+        been reached.
+        """
+
+        return self.retry_count < self.max_retries
+
     def display_info(self):
         print(f"Task ID: {self.task_id}")
         print(f"Workload Type: {self.workload_type}")
@@ -64,6 +86,9 @@ class Task:
 
         print(f"Deadline: {self.deadline_seconds} seconds")
         print(f"Priority: {self.priority}")
+
+        print(f"Retry Count: {self.retry_count}")
+        print(f"Max Retries: {self.max_retries}")
 
         print(f"State: {self.state}")
 
