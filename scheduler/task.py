@@ -61,7 +61,7 @@ class Task:
 
     def increment_retry(self):
         """
-        Increment the number of scheduling retries.
+        Increment the number of scheduling or execution retries.
         """
 
         self.retry_count += 1
@@ -75,6 +75,25 @@ class Task:
         """
 
         return self.retry_count < self.max_retries
+
+    def retry(self):
+        """
+        Move a failed task back to PENDING for another attempt.
+
+        Returns True if the retry is allowed.
+        Returns False if the retry limit has been reached.
+        """
+
+        if not self.can_retry():
+            return False
+
+        self.increment_retry()
+
+        self.state = "PENDING"
+        self.assigned_node = None
+        self.failure_reason = None
+
+        return True
 
     def display_info(self):
         print(f"Task ID: {self.task_id}")
