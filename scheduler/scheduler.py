@@ -183,8 +183,9 @@ class QoSScheduler:
         Retrieve the highest-priority pending task and
         attempt to schedule it.
 
-        If no feasible node exists, the task remains
-        pending in the queue.
+        If no feasible node exists, increment the retry
+        count. If the retry limit is reached, fail the task.
+        Otherwise, keep the task pending.
         """
 
         task = self.get_next_task()
@@ -196,6 +197,14 @@ class QoSScheduler:
 
         if best_node is None:
 
+            task.increment_retry()
+
+            if not task.can_retry():
+
+                task.fail("Retry limit reached")
+
+                return "FAILED", task
+
             self.task_queue.add_task(task)
 
             return None
@@ -203,6 +212,14 @@ class QoSScheduler:
         allocated = best_node.allocate_task(task)
 
         if not allocated:
+
+            task.increment_retry()
+
+            if not task.can_retry():
+
+                task.fail("Retry limit reached")
+
+                return "FAILED", task
 
             self.task_queue.add_task(task)
 
@@ -214,8 +231,7 @@ class QoSScheduler:
         """
         Retry scheduling pending tasks.
 
-        This method is useful after a running task completes
-        and releases resources.
+        Tasks that reach their retry limit are marked FAILED.
 
         Returns a list of successfully scheduled tasks.
         """
@@ -230,6 +246,10 @@ class QoSScheduler:
 
             if result is None:
                 break
+
+            if result[0] == "FAILED":
+
+                continue
 
             scheduled_tasks.append(result)
 
