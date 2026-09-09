@@ -2,6 +2,7 @@ class TaskExecutor:
     def __init__(self):
         self.active_tasks = []
         self.completed_tasks = []
+        self.failed_tasks = []
 
     def estimate_execution_time(self, task, node):
         """
@@ -64,9 +65,18 @@ class TaskExecutor:
 
     def complete_task(self, task_state):
         """
-        Complete an active task and release its resources.
+        Complete an active task.
+
+        If the estimated execution time exceeds the
+        task deadline, the task becomes FAILED.
+
+        Otherwise:
 
         RUNNING -> COMPLETED
+
+        Deadline exceeded:
+
+        RUNNING -> FAILED
         """
 
         task = task_state["task"]
@@ -81,19 +91,40 @@ class TaskExecutor:
         # Release allocated resources
         node.release_task(task)
 
-        # Update task lifecycle
-        task.complete()
+        if deadline_met:
 
-        result = {
-            "task_id": task.task_id,
-            "node_id": node.node_id,
-            "execution_time": execution_time,
-            "deadline_seconds": task.deadline_seconds,
-            "deadline_met": deadline_met,
-            "state": task.state
-        }
+            # Successful completion
+            task.complete()
+
+            result = {
+                "task_id": task.task_id,
+                "node_id": node.node_id,
+                "execution_time": execution_time,
+                "deadline_seconds": task.deadline_seconds,
+                "deadline_met": True,
+                "state": task.state,
+                "failure_reason": None
+            }
+
+            self.completed_tasks.append(result)
+
+        else:
+
+            # Deadline failure
+            task.fail("Deadline exceeded")
+
+            result = {
+                "task_id": task.task_id,
+                "node_id": node.node_id,
+                "execution_time": execution_time,
+                "deadline_seconds": task.deadline_seconds,
+                "deadline_met": False,
+                "state": task.state,
+                "failure_reason": task.failure_reason
+            }
+
+            self.failed_tasks.append(result)
 
         self.active_tasks.remove(task_state)
-        self.completed_tasks.append(result)
 
         return result
