@@ -21,6 +21,34 @@ class Task:
         self.deadline_seconds = deadline_seconds
         self.priority = priority
 
+        # Task lifecycle
+        self.state = "PENDING"
+
+        # Node assigned to the task
+        self.assigned_node = None
+
+    def start(self, node):
+        """
+        Move the task from PENDING to RUNNING.
+        """
+
+        self.state = "RUNNING"
+        self.assigned_node = node
+
+    def complete(self):
+        """
+        Move the task from RUNNING to COMPLETED.
+        """
+
+        self.state = "COMPLETED"
+
+    def fail(self):
+        """
+        Move the task to FAILED.
+        """
+
+        self.state = "FAILED"
+
     def display_info(self):
         print(f"Task ID: {self.task_id}")
         print(f"Workload Type: {self.workload_type}")
@@ -31,5 +59,12 @@ class Task:
 
         print(f"Deadline: {self.deadline_seconds} seconds")
         print(f"Priority: {self.priority}")
+
+        print(f"State: {self.state}")
+
+        if self.assigned_node is not None:
+            print(f"Assigned Node: {self.assigned_node.node_id}")
+        else:
+            print("Assigned Node: None")
 
         print("-" * 40)
