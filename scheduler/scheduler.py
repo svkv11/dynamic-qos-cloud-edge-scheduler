@@ -1,6 +1,9 @@
+from scheduler.task_queue import TaskQueue
+
 class QoSScheduler:
     def __init__(self, nodes):
         self.nodes = nodes
+        self.task_queue = TaskQueue()
 
     def calculate_priority_score(self, task):
         """
@@ -22,8 +25,6 @@ class QoSScheduler:
         Shorter deadlines receive higher urgency scores.
 
         This is NOT a deadline guarantee.
-        Actual deadline satisfaction will be measured later
-        when task execution simulation is implemented.
         """
 
         if task.deadline_seconds is None:
@@ -109,6 +110,10 @@ class QoSScheduler:
         return rankings
 
     def select_best_node(self, task):
+        """
+        Select the highest-scoring feasible node.
+        """
+
         rankings = self.get_node_rankings(task)
 
         if not rankings:
@@ -116,7 +121,42 @@ class QoSScheduler:
 
         return rankings[0]["node"]
 
+    def add_task(self, task):
+        """
+        Add a pending task to the scheduler queue.
+        """
+
+        return self.task_queue.add_task(task)
+
+    def get_next_task(self):
+        """
+        Retrieve the next pending task from the queue.
+        """
+
+        return self.task_queue.get_next_task()
+
+    def has_pending_tasks(self):
+        """
+        Check whether pending tasks exist in the queue.
+        """
+
+        return not self.task_queue.is_empty()
+
+    def pending_task_count(self):
+        """
+        Return the number of pending tasks.
+        """
+
+        return self.task_queue.size()
+
     def schedule_task(self, task):
+        """
+        Schedule a task directly onto the best feasible node.
+
+        Queue management is handled separately by add_task()
+        and get_next_task().
+        """
+
         best_node = self.select_best_node(task)
 
         if best_node is None:
@@ -128,3 +168,32 @@ class QoSScheduler:
             return None
 
         return best_node
+
+    def schedule_next_task(self):
+        """
+        Retrieve the next task from the queue and schedule it.
+
+        If no pending task exists, return None.
+
+        If no feasible node exists, the task is returned to the
+        pending queue so it is not lost.
+        """
+
+        task = self.get_next_task()
+
+        if task is None:
+            return None
+
+        best_node = self.select_best_node(task)
+
+        if best_node is None:
+            self.task_queue.pending_tasks.insert(0, task)
+            return None
+
+        allocated = best_node.allocate_task(task)
+
+        if not allocated:
+            self.task_queue.pending_tasks.insert(0, task)
+            return None
+
+        return task, best_node
