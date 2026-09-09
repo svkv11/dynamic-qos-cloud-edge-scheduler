@@ -107,7 +107,7 @@ print("=" * 60)
 
 
 # ---------------------------------------------------------
-# Phase 1: Add all tasks to the scheduler queue
+# Phase 1: Add tasks to the QoS-aware queue
 # ---------------------------------------------------------
 
 print()
@@ -147,57 +147,18 @@ active_tasks = []
 
 while scheduler.has_pending_tasks():
 
-    task = scheduler.get_next_task()
+    result = scheduler.schedule_next_task()
 
-    if task is None:
-        break
-
-    print()
-    print("=" * 60)
-    print(f"Scheduling Task: {task.task_id}")
-    print(f"Workload: {task.workload_type}")
-    print("=" * 60)
-
-    print("Node State Before Scheduling:")
-
-    for node in nodes:
-        print(
-            f"{node.node_id} | "
-            f"CPU={node.cpu_utilization:.2f}% | "
-            f"Memory={node.memory_utilization:.2f}% | "
-            f"GPU={node.gpu_utilization:.2f}%"
-        )
-
-    best_node = scheduler.select_best_node(task)
-
-    if best_node is None:
-
+    if result is None:
         print()
-        print("No feasible node available.")
-
-        # Put the task back into the queue
-        scheduler.task_queue.pending_tasks.insert(
-            0,
-            task
+        print("No feasible node currently available.")
+        print(
+            f"Pending Tasks Waiting: "
+            f"{scheduler.pending_task_count()}"
         )
-
         break
 
-    print()
-    print(f"Selected Node: {best_node.node_id}")
-
-    allocated = best_node.allocate_task(task)
-
-    if not allocated:
-
-        print("Task allocation failed.")
-
-        scheduler.task_queue.pending_tasks.insert(
-            0,
-            task
-        )
-
-        break
+    task, best_node = result
 
     task_state = executor.start_task(
         task,
@@ -207,14 +168,19 @@ while scheduler.has_pending_tasks():
     active_tasks.append(task_state)
 
     print()
-    print("Task Started")
+    print("=" * 60)
+    print(f"Task Started: {task.task_id}")
+    print(f"Workload: {task.workload_type}")
+    print(f"Selected Node: {best_node.node_id}")
+    print(f"Priority: {task.priority}")
+    print(f"Deadline: {task.deadline_seconds}s")
     print(f"State: {task.state}")
     print(
         f"Estimated Execution Time: "
         f"{task_state['execution_time']} seconds"
     )
+    print("=" * 60)
 
-    print()
     print("Node State After Allocation:")
 
     best_node.display_info()
@@ -235,11 +201,18 @@ print("COMPLETING ACTIVE TASKS")
 print("=" * 60)
 
 
-for task_state in active_tasks:
+completed_count = 0
+
+
+while active_tasks:
+
+    task_state = active_tasks.pop(0)
 
     result = executor.complete_task(
         task_state
     )
+
+    completed_count += 1
 
     print()
     print(f"Completed Task: {result['task_id']}")
@@ -258,6 +231,45 @@ for task_state in active_tasks:
     )
     print(f"State: {result['state']}")
 
+    # -----------------------------------------------------
+    # Automatically retry pending tasks after resources
+    # are released.
+    # -----------------------------------------------------
+
+    if scheduler.has_pending_tasks():
+
+        print()
+        print("-" * 60)
+        print("RETRYING PENDING TASKS AFTER RESOURCE RELEASE")
+        print("-" * 60)
+
+        retry_results = scheduler.retry_pending_tasks()
+
+        for retry_task, retry_node in retry_results:
+
+            retry_state = executor.start_task(
+                retry_task,
+                retry_node
+            )
+
+            active_tasks.append(retry_state)
+
+            print(
+                f"Retried Task: {retry_task.task_id} | "
+                f"Selected Node: {retry_node.node_id} | "
+                f"State: {retry_task.state}"
+            )
+
+            print(
+                f"Estimated Execution Time: "
+                f"{retry_state['execution_time']} seconds"
+            )
+
+        print(
+            f"Pending Tasks After Retry: "
+            f"{scheduler.pending_task_count()}"
+        )
+
 
 # ---------------------------------------------------------
 # Phase 4: Final infrastructure state
@@ -275,6 +287,7 @@ for node in nodes:
 
 print()
 print("=" * 60)
+print(f"Completed Tasks: {completed_count}")
 print(
     f"Remaining Pending Tasks: "
     f"{scheduler.pending_task_count()}"
