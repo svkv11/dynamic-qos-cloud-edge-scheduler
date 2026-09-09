@@ -4,18 +4,56 @@ class TaskQueue:
 
     def add_task(self, task):
         """
-        Add a task to the pending queue.
+        Add a pending task to the queue.
+
+        Tasks are maintained in QoS-aware order:
+        1. Higher priority first
+        2. Shorter deadline first
+        3. Earlier arrival first when values are equal
         """
 
         if task.state != "PENDING":
             return False
 
         self.pending_tasks.append(task)
+
+        self._sort_queue()
+
         return True
+
+    def _deadline_value(self, task):
+        """
+        Convert deadline into a sortable value.
+
+        Tasks without a deadline are placed after
+        tasks that have deadlines.
+        """
+
+        if task.deadline_seconds is None:
+            return float("inf")
+
+        return task.deadline_seconds
+
+    def _sort_queue(self):
+        """
+        Sort pending tasks according to QoS requirements.
+
+        Higher priority comes first.
+        For equal priority, shorter deadlines come first.
+        Python's stable sorting preserves arrival order
+        when both values are equal.
+        """
+
+        self.pending_tasks.sort(
+            key=lambda task: (
+                -task.priority,
+                self._deadline_value(task)
+            )
+        )
 
     def get_next_task(self):
         """
-        Remove and return the next pending task.
+        Remove and return the highest-priority pending task.
 
         Returns None if the queue is empty.
         """
@@ -27,7 +65,7 @@ class TaskQueue:
 
     def peek_next_task(self):
         """
-        Return the next pending task without removing it.
+        Return the next task without removing it.
         """
 
         if not self.pending_tasks:
@@ -51,11 +89,11 @@ class TaskQueue:
 
     def display_queue(self):
         """
-        Display all pending tasks in the queue.
+        Display all pending tasks in QoS order.
         """
 
         print("=" * 40)
-        print("TASK QUEUE")
+        print("QOS-AWARE TASK QUEUE")
         print("=" * 40)
 
         if self.is_empty():
@@ -70,6 +108,7 @@ class TaskQueue:
                     f"{task.task_id} | "
                     f"{task.workload_type} | "
                     f"Priority={task.priority} | "
+                    f"Deadline={task.deadline_seconds}s | "
                     f"State={task.state}"
                 )
 
