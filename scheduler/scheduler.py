@@ -1,5 +1,6 @@
 from scheduler.task_queue import TaskQueue
 
+
 class QoSScheduler:
     def __init__(self, nodes):
         self.nodes = nodes
@@ -69,13 +70,6 @@ class QoSScheduler:
         """
         Rank all feasible nodes for a given task.
 
-        Returns a list containing:
-        - node
-        - resource score
-        - priority score
-        - deadline score
-        - final score
-
         The highest final score is ranked first.
         """
 
@@ -85,8 +79,12 @@ class QoSScheduler:
         deadline_score = self.calculate_deadline_score(task)
 
         for node in self.nodes:
+
             if node.can_run_task(task):
-                resource_score = node.calculate_qos_score(task)
+
+                resource_score = node.calculate_qos_score(
+                    task
+                )
 
                 final_score = (
                     0.80 * resource_score
@@ -96,10 +94,22 @@ class QoSScheduler:
 
                 rankings.append({
                     "node": node,
-                    "resource_score": round(resource_score, 2),
-                    "priority_score": round(priority_score, 2),
-                    "deadline_score": round(deadline_score, 2),
-                    "final_score": round(final_score, 2)
+                    "resource_score": round(
+                        resource_score,
+                        2
+                    ),
+                    "priority_score": round(
+                        priority_score,
+                        2
+                    ),
+                    "deadline_score": round(
+                        deadline_score,
+                        2
+                    ),
+                    "final_score": round(
+                        final_score,
+                        2
+                    )
                 })
 
         rankings.sort(
@@ -153,8 +163,7 @@ class QoSScheduler:
         """
         Schedule a task directly onto the best feasible node.
 
-        Queue management is handled separately by add_task()
-        and get_next_task().
+        Returns the selected node or None.
         """
 
         best_node = self.select_best_node(task)
@@ -171,12 +180,11 @@ class QoSScheduler:
 
     def schedule_next_task(self):
         """
-        Retrieve the next task from the queue and schedule it.
+        Retrieve the highest-priority pending task and
+        attempt to schedule it.
 
-        If no pending task exists, return None.
-
-        If no feasible node exists, the task is returned to the
-        pending queue so it is not lost.
+        If no feasible node exists, the task remains
+        pending in the queue.
         """
 
         task = self.get_next_task()
@@ -187,13 +195,42 @@ class QoSScheduler:
         best_node = self.select_best_node(task)
 
         if best_node is None:
-            self.task_queue.pending_tasks.insert(0, task)
+
+            self.task_queue.add_task(task)
+
             return None
 
         allocated = best_node.allocate_task(task)
 
         if not allocated:
-            self.task_queue.pending_tasks.insert(0, task)
+
+            self.task_queue.add_task(task)
+
             return None
 
         return task, best_node
+
+    def retry_pending_tasks(self):
+        """
+        Retry scheduling pending tasks.
+
+        This method is useful after a running task completes
+        and releases resources.
+
+        Returns a list of successfully scheduled tasks.
+        """
+
+        scheduled_tasks = []
+
+        pending_count = self.pending_task_count()
+
+        for _ in range(pending_count):
+
+            result = self.schedule_next_task()
+
+            if result is None:
+                break
+
+            scheduled_tasks.append(result)
+
+        return scheduled_tasks
