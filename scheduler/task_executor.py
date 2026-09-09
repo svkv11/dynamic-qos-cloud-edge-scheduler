@@ -39,15 +39,18 @@ class TaskExecutor:
 
     def start_task(self, task, node):
         """
-        Start a task without immediately releasing its resources.
+        Start a task and update its lifecycle state.
 
-        The task remains active until complete_task() is called.
+        PENDING -> RUNNING
         """
 
         execution_time = self.estimate_execution_time(
             task,
             node
         )
+
+        # Update task lifecycle
+        task.start(node)
 
         task_state = {
             "task": task,
@@ -62,6 +65,8 @@ class TaskExecutor:
     def complete_task(self, task_state):
         """
         Complete an active task and release its resources.
+
+        RUNNING -> COMPLETED
         """
 
         task = task_state["task"]
@@ -73,14 +78,19 @@ class TaskExecutor:
             or execution_time <= task.deadline_seconds
         )
 
+        # Release allocated resources
         node.release_task(task)
+
+        # Update task lifecycle
+        task.complete()
 
         result = {
             "task_id": task.task_id,
             "node_id": node.node_id,
             "execution_time": execution_time,
             "deadline_seconds": task.deadline_seconds,
-            "deadline_met": deadline_met
+            "deadline_met": deadline_met,
+            "state": task.state
         }
 
         self.active_tasks.remove(task_state)
