@@ -1,7 +1,7 @@
-from compute_node import ComputeNode
-from task import Task
-from scheduler import QoSScheduler
-from task_executor import TaskExecutor
+from scheduler.compute_node import ComputeNode
+from scheduler.task import Task
+from scheduler.scheduler import QoSScheduler
+from scheduler.task_executor import TaskExecutor
 
 
 def create_nodes():
@@ -91,7 +91,10 @@ tasks = [
 ]
 
 
-# Create infrastructure once.
+# ---------------------------------------------------------
+# Create infrastructure and scheduler
+# ---------------------------------------------------------
+
 nodes = create_nodes()
 
 scheduler = QoSScheduler(nodes)
@@ -99,22 +102,59 @@ executor = TaskExecutor()
 
 
 print("=" * 60)
-print("DYNAMIC TASK ARRIVAL SIMULATION")
+print("DYNAMIC QOS CLOUD-EDGE SCHEDULER")
+print("=" * 60)
+
+
+# ---------------------------------------------------------
+# Phase 1: Add all tasks to the scheduler queue
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("ADDING TASKS TO QUEUE")
+print("=" * 60)
+
+
+for task in tasks:
+
+    added = scheduler.add_task(task)
+
+    print(
+        f"{task.task_id} | "
+        f"Priority={task.priority} | "
+        f"Deadline={task.deadline_seconds}s | "
+        f"Added={added}"
+    )
+
+
+print()
+print(f"Pending Tasks: {scheduler.pending_task_count()}")
+
+
+# ---------------------------------------------------------
+# Phase 2: Schedule tasks from the queue
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("SCHEDULING TASKS FROM QUEUE")
 print("=" * 60)
 
 
 active_tasks = []
 
 
-# ---------------------------------------------------------
-# Phase 1: Start tasks without immediately completing them.
-# ---------------------------------------------------------
+while scheduler.has_pending_tasks():
 
-for task in tasks:
+    task = scheduler.get_next_task()
+
+    if task is None:
+        break
 
     print()
     print("=" * 60)
-    print(f"Task Arrival: {task.task_id}")
+    print(f"Scheduling Task: {task.task_id}")
     print(f"Workload: {task.workload_type}")
     print("=" * 60)
 
@@ -131,8 +171,17 @@ for task in tasks:
     best_node = scheduler.select_best_node(task)
 
     if best_node is None:
+
+        print()
         print("No feasible node available.")
-        continue
+
+        # Put the task back into the queue
+        scheduler.task_queue.pending_tasks.insert(
+            0,
+            task
+        )
+
+        break
 
     print()
     print(f"Selected Node: {best_node.node_id}")
@@ -140,8 +189,15 @@ for task in tasks:
     allocated = best_node.allocate_task(task)
 
     if not allocated:
+
         print("Task allocation failed.")
-        continue
+
+        scheduler.task_queue.pending_tasks.insert(
+            0,
+            task
+        )
+
+        break
 
     task_state = executor.start_task(
         task,
@@ -152,16 +208,25 @@ for task in tasks:
 
     print()
     print("Task Started")
-    print(f"Estimated Execution Time: {task_state['execution_time']} seconds")
+    print(f"State: {task.state}")
+    print(
+        f"Estimated Execution Time: "
+        f"{task_state['execution_time']} seconds"
+    )
 
     print()
     print("Node State After Allocation:")
 
     best_node.display_info()
 
+    print(
+        f"Remaining Pending Tasks: "
+        f"{scheduler.pending_task_count()}"
+    )
+
 
 # ---------------------------------------------------------
-# Phase 2: Complete all active tasks.
+# Phase 3: Complete active tasks
 # ---------------------------------------------------------
 
 print()
@@ -179,13 +244,23 @@ for task_state in active_tasks:
     print()
     print(f"Completed Task: {result['task_id']}")
     print(f"Node: {result['node_id']}")
-    print(f"Execution Time: {result['execution_time']} seconds")
-    print(f"Deadline: {result['deadline_seconds']} seconds")
-    print(f"Deadline Met: {result['deadline_met']}")
+    print(
+        f"Execution Time: "
+        f"{result['execution_time']} seconds"
+    )
+    print(
+        f"Deadline: "
+        f"{result['deadline_seconds']} seconds"
+    )
+    print(
+        f"Deadline Met: "
+        f"{result['deadline_met']}"
+    )
+    print(f"State: {result['state']}")
 
 
 # ---------------------------------------------------------
-# Final infrastructure state
+# Phase 4: Final infrastructure state
 # ---------------------------------------------------------
 
 print()
@@ -193,5 +268,15 @@ print("=" * 60)
 print("FINAL NODE STATES")
 print("=" * 60)
 
+
 for node in nodes:
     node.display_info()
+
+
+print()
+print("=" * 60)
+print(
+    f"Remaining Pending Tasks: "
+    f"{scheduler.pending_task_count()}"
+)
+print("=" * 60)
