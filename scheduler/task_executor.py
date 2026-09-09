@@ -128,3 +128,40 @@ class TaskExecutor:
         self.active_tasks.remove(task_state)
 
         return result
+
+    def fail_task(self, task_state, reason):
+        """
+        Simulate an execution failure.
+
+        The task is moved from RUNNING to FAILED,
+        resources are released, and the failure is
+        recorded.
+
+        Parameters:
+        - task_state: active task state
+        - reason: explanation for the failure
+        """
+
+        task = task_state["task"]
+        node = task_state["node"]
+
+        # Release allocated resources
+        node.release_task(task)
+
+        # Update task lifecycle
+        task.fail(reason)
+
+        result = {
+            "task_id": task.task_id,
+            "node_id": node.node_id,
+            "execution_time": task_state["execution_time"],
+            "deadline_seconds": task.deadline_seconds,
+            "deadline_met": None,
+            "state": task.state,
+            "failure_reason": task.failure_reason
+        }
+
+        self.active_tasks.remove(task_state)
+        self.failed_tasks.append(result)
+
+        return result
