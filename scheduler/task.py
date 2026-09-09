@@ -27,6 +27,9 @@ class Task:
         # Node assigned to the task
         self.assigned_node = None
 
+        # Failure information
+        self.failure_reason = None
+
     def start(self, node):
         """
         Move the task from PENDING to RUNNING.
@@ -34,6 +37,7 @@ class Task:
 
         self.state = "RUNNING"
         self.assigned_node = node
+        self.failure_reason = None
 
     def complete(self):
         """
@@ -42,12 +46,13 @@ class Task:
 
         self.state = "COMPLETED"
 
-    def fail(self):
+    def fail(self, reason):
         """
-        Move the task to FAILED.
+        Move the task to FAILED and record the reason.
         """
 
         self.state = "FAILED"
+        self.failure_reason = reason
 
     def display_info(self):
         print(f"Task ID: {self.task_id}")
@@ -63,8 +68,19 @@ class Task:
         print(f"State: {self.state}")
 
         if self.assigned_node is not None:
-            print(f"Assigned Node: {self.assigned_node.node_id}")
+            print(
+                f"Assigned Node: "
+                f"{self.assigned_node.node_id}"
+            )
         else:
             print("Assigned Node: None")
+
+        if self.failure_reason is not None:
+            print(
+                f"Failure Reason: "
+                f"{self.failure_reason}"
+            )
+        else:
+            print("Failure Reason: None")
 
         print("-" * 40)
