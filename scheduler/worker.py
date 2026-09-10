@@ -6,7 +6,7 @@ class Worker:
 
     def start(self):
         """
-        Mark the worker as ready to execute a task.
+        Mark the worker as ready to execute tasks.
         """
         self.status = "READY"
 
@@ -15,6 +15,35 @@ class Worker:
         Mark the worker as stopped.
         """
         self.status = "STOPPED"
+
+    def execute_task(self, task, executor):
+        """
+        Execute a task using the TaskExecutor.
+
+        The worker must be READY before execution.
+
+        READY -> BUSY
+
+        Returns the task state created by the executor.
+        """
+        if self.status != "READY":
+            return None
+
+        self.status = "BUSY"
+
+        task_state = executor.start_task(
+            task,
+            self.node
+        )
+
+        return task_state
+
+    def task_finished(self):
+        """
+        Mark the worker as ready after task execution.
+        """
+        if self.status == "BUSY":
+            self.status = "READY"
 
     def display_info(self):
         print(f"Worker ID: {self.worker_id}")
