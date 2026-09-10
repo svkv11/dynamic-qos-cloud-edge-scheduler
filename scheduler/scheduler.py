@@ -138,6 +138,20 @@ class QoSScheduler:
 
         return self.task_queue.add_task(task)
 
+    def requeue_task(self, task):
+        """
+        Re-add a retryable task to the scheduler queue.
+
+        The task must be in PENDING state.
+
+        Returns True if the task was added successfully.
+        """
+
+        if task.state != "PENDING":
+            return False
+
+        return self.task_queue.add_task(task)
+
     def get_next_task(self):
         """
         Retrieve the next pending task from the queue.
