@@ -2,6 +2,7 @@ from scheduler.compute_node import ComputeNode
 from scheduler.task import Task
 from scheduler.scheduler import QoSScheduler
 from scheduler.task_executor import TaskExecutor
+from scheduler.worker import Worker
 
 
 def create_nodes():
@@ -92,7 +93,7 @@ tasks = [
 
 
 # ---------------------------------------------------------
-# Create infrastructure and scheduler
+# Create infrastructure, scheduler, executor and workers
 # ---------------------------------------------------------
 
 nodes = create_nodes()
@@ -100,10 +101,54 @@ nodes = create_nodes()
 scheduler = QoSScheduler(nodes)
 executor = TaskExecutor()
 
+workers = [
+    Worker("worker-01", nodes[0]),
+    Worker("worker-02", nodes[1]),
+    Worker("worker-03", nodes[2])
+]
+
+for worker in workers:
+    worker.start()
+
+
+# ---------------------------------------------------------
+# Create node-to-worker mapping
+# ---------------------------------------------------------
+
+worker_map = {
+    worker.node.node_id: worker
+    for worker in workers
+}
+
+
+def get_available_nodes():
+    """
+    Return nodes whose workers are currently READY.
+    """
+
+    return [
+        worker.node
+        for worker in workers
+        if worker.status == "READY"
+    ]
+
 
 print("=" * 60)
 print("DYNAMIC QOS CLOUD-EDGE SCHEDULER")
 print("=" * 60)
+
+
+# ---------------------------------------------------------
+# Display worker information
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("WORKER STATUS")
+print("=" * 60)
+
+for worker in workers:
+    worker.display_info()
 
 
 # ---------------------------------------------------------
@@ -133,7 +178,7 @@ print(f"Pending Tasks: {scheduler.pending_task_count()}")
 
 
 # ---------------------------------------------------------
-# Phase 2: Schedule tasks from the queue
+# Phase 2: Schedule tasks from queue
 # ---------------------------------------------------------
 
 print()
@@ -147,38 +192,66 @@ active_tasks = []
 
 while scheduler.has_pending_tasks():
 
-    result = scheduler.schedule_next_task()
+    available_nodes = get_available_nodes()
+
+    result = scheduler.schedule_next_task(
+        available_nodes
+    )
 
     if result is None:
+
         print()
-        print("No feasible node currently available.")
+        print("No READY worker with a feasible node is available.")
+
         print(
             f"Pending Tasks Waiting: "
             f"{scheduler.pending_task_count()}"
         )
+
         break
 
     task, best_node = result
 
-    task_state = executor.start_task(
+    worker = worker_map[best_node.node_id]
+
+    task_state = worker.execute_task(
         task,
-        best_node
+        executor
     )
 
-    active_tasks.append(task_state)
+    if task_state is None:
+
+        print()
+        print(
+            f"Worker {worker.worker_id} "
+            f"is not available."
+        )
+
+        break
+
+    active_tasks.append(
+        {
+            "task_state": task_state,
+            "worker": worker
+        }
+    )
 
     print()
     print("=" * 60)
     print(f"Task Started: {task.task_id}")
     print(f"Workload: {task.workload_type}")
     print(f"Selected Node: {best_node.node_id}")
+    print(f"Worker: {worker.worker_id}")
+    print(f"Worker Status: {worker.status}")
     print(f"Priority: {task.priority}")
     print(f"Deadline: {task.deadline_seconds}s")
     print(f"State: {task.state}")
+
     print(
         f"Estimated Execution Time: "
         f"{task_state['execution_time']} seconds"
     )
+
     print("=" * 60)
 
     print("Node State After Allocation:")
@@ -206,58 +279,96 @@ completed_count = 0
 
 while active_tasks:
 
-    task_state = active_tasks.pop(0)
+    active_task = active_tasks.pop(0)
+
+    task_state = active_task["task_state"]
+    worker = active_task["worker"]
 
     result = executor.complete_task(
         task_state
     )
+
+    worker.task_finished()
 
     completed_count += 1
 
     print()
     print(f"Completed Task: {result['task_id']}")
     print(f"Node: {result['node_id']}")
+    print(f"Worker: {worker.worker_id}")
+    print(f"Worker Status: {worker.status}")
+
     print(
         f"Execution Time: "
         f"{result['execution_time']} seconds"
     )
+
     print(
         f"Deadline: "
         f"{result['deadline_seconds']} seconds"
     )
+
     print(
         f"Deadline Met: "
         f"{result['deadline_met']}"
     )
+
     print(f"State: {result['state']}")
 
     # -----------------------------------------------------
-    # Automatically retry pending tasks after resources
-    # are released.
+    # Retry pending tasks after a worker becomes READY
     # -----------------------------------------------------
 
     if scheduler.has_pending_tasks():
 
         print()
         print("-" * 60)
-        print("RETRYING PENDING TASKS AFTER RESOURCE RELEASE")
+        print("RETRYING PENDING TASKS AFTER WORKER BECOMES READY")
         print("-" * 60)
 
-        retry_results = scheduler.retry_pending_tasks()
+        available_nodes = get_available_nodes()
+
+        retry_results = scheduler.retry_pending_tasks(
+            available_nodes
+        )
 
         for retry_task, retry_node in retry_results:
 
-            retry_state = executor.start_task(
+            retry_worker = worker_map[
+                retry_node.node_id
+            ]
+
+            retry_state = retry_worker.execute_task(
                 retry_task,
-                retry_node
+                executor
             )
 
-            active_tasks.append(retry_state)
+            if retry_state is None:
+
+                print(
+                    f"Worker {retry_worker.worker_id} "
+                    f"is not available."
+                )
+
+                continue
+
+            active_tasks.append(
+                {
+                    "task_state": retry_state,
+                    "worker": retry_worker
+                }
+            )
 
             print(
                 f"Retried Task: {retry_task.task_id} | "
                 f"Selected Node: {retry_node.node_id} | "
+                f"Worker: {retry_worker.worker_id} | "
                 f"State: {retry_task.state}"
+            )
+
+            print(
+                f"Worker Status: "
+                f"{retry_worker.status}"
             )
 
             print(
@@ -272,7 +383,21 @@ while active_tasks:
 
 
 # ---------------------------------------------------------
-# Phase 4: Final infrastructure state
+# Phase 4: Final worker states
+# ---------------------------------------------------------
+
+print()
+print("=" * 60)
+print("FINAL WORKER STATES")
+print("=" * 60)
+
+
+for worker in workers:
+    worker.display_info()
+
+
+# ---------------------------------------------------------
+# Phase 5: Final infrastructure state
 # ---------------------------------------------------------
 
 print()
@@ -288,8 +413,10 @@ for node in nodes:
 print()
 print("=" * 60)
 print(f"Completed Tasks: {completed_count}")
+
 print(
     f"Remaining Pending Tasks: "
     f"{scheduler.pending_task_count()}"
 )
+
 print("=" * 60)
