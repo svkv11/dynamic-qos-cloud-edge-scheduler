@@ -3,6 +3,7 @@ from scheduler.task import Task
 from scheduler.scheduler import QoSScheduler
 from scheduler.task_executor import TaskExecutor
 from scheduler.worker import Worker
+from scheduler.worker_manager import WorkerManager
 
 
 def create_nodes():
@@ -93,7 +94,7 @@ tasks = [
 
 
 # ---------------------------------------------------------
-# Create infrastructure, scheduler, executor and workers
+# Create infrastructure, scheduler and executor
 # ---------------------------------------------------------
 
 nodes = create_nodes()
@@ -101,36 +102,25 @@ nodes = create_nodes()
 scheduler = QoSScheduler(nodes)
 executor = TaskExecutor()
 
+
+# ---------------------------------------------------------
+# Create workers
+# ---------------------------------------------------------
+
 workers = [
     Worker("worker-01", nodes[0]),
     Worker("worker-02", nodes[1]),
     Worker("worker-03", nodes[2])
 ]
 
-for worker in workers:
-    worker.start()
-
 
 # ---------------------------------------------------------
-# Create node-to-worker mapping
+# Create worker manager
 # ---------------------------------------------------------
 
-worker_map = {
-    worker.node.node_id: worker
-    for worker in workers
-}
+worker_manager = WorkerManager(workers)
 
-
-def get_available_nodes():
-    """
-    Return nodes whose workers are currently READY.
-    """
-
-    return [
-        worker.node
-        for worker in workers
-        if worker.status == "READY"
-    ]
+worker_manager.start_all()
 
 
 print("=" * 60)
@@ -143,12 +133,7 @@ print("=" * 60)
 # ---------------------------------------------------------
 
 print()
-print("=" * 60)
-print("WORKER STATUS")
-print("=" * 60)
-
-for worker in workers:
-    worker.display_info()
+worker_manager.display_status()
 
 
 # ---------------------------------------------------------
@@ -174,7 +159,10 @@ for task in tasks:
 
 
 print()
-print(f"Pending Tasks: {scheduler.pending_task_count()}")
+print(
+    f"Pending Tasks: "
+    f"{scheduler.pending_task_count()}"
+)
 
 
 # ---------------------------------------------------------
@@ -192,7 +180,7 @@ active_tasks = []
 
 while scheduler.has_pending_tasks():
 
-    available_nodes = get_available_nodes()
+    available_nodes = worker_manager.get_available_nodes()
 
     result = scheduler.schedule_next_task(
         available_nodes
@@ -201,7 +189,10 @@ while scheduler.has_pending_tasks():
     if result is None:
 
         print()
-        print("No READY worker with a feasible node is available.")
+        print(
+            "No READY worker with a feasible "
+            "node is available."
+        )
 
         print(
             f"Pending Tasks Waiting: "
@@ -212,7 +203,19 @@ while scheduler.has_pending_tasks():
 
     task, best_node = result
 
-    worker = worker_map[best_node.node_id]
+    worker = worker_manager.get_worker_for_node(
+        best_node.node_id
+    )
+
+    if worker is None:
+
+        print()
+        print(
+            f"No worker found for node "
+            f"{best_node.node_id}."
+        )
+
+        break
 
     task_state = worker.execute_task(
         task,
@@ -323,10 +326,13 @@ while active_tasks:
 
         print()
         print("-" * 60)
-        print("RETRYING PENDING TASKS AFTER WORKER BECOMES READY")
+        print(
+            "RETRYING PENDING TASKS AFTER "
+            "WORKER BECOMES READY"
+        )
         print("-" * 60)
 
-        available_nodes = get_available_nodes()
+        available_nodes = worker_manager.get_available_nodes()
 
         retry_results = scheduler.retry_pending_tasks(
             available_nodes
@@ -334,9 +340,18 @@ while active_tasks:
 
         for retry_task, retry_node in retry_results:
 
-            retry_worker = worker_map[
+            retry_worker = worker_manager.get_worker_for_node(
                 retry_node.node_id
-            ]
+            )
+
+            if retry_worker is None:
+
+                print(
+                    f"No worker found for node "
+                    f"{retry_node.node_id}."
+                )
+
+                continue
 
             retry_state = retry_worker.execute_task(
                 retry_task,
@@ -391,9 +406,7 @@ print("=" * 60)
 print("FINAL WORKER STATES")
 print("=" * 60)
 
-
-for worker in workers:
-    worker.display_info()
+worker_manager.display_status()
 
 
 # ---------------------------------------------------------
