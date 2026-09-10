@@ -165,3 +165,47 @@ class TaskExecutor:
         self.failed_tasks.append(result)
 
         return result
+
+    def handle_failure(self, task_state, reason):
+        """
+        Handle an execution failure and determine
+        whether the task should be retried.
+
+        The task is first marked FAILED and its
+        resources are released.
+
+        If retries are available:
+            FAILED -> PENDING
+
+        Otherwise:
+            FAILED -> FAILED
+
+        Returns a dictionary describing the outcome.
+        """
+
+        result = self.fail_task(
+            task_state,
+            reason
+        )
+
+        task = task_state["task"]
+
+        if task.can_retry():
+
+            task.retry()
+
+            return {
+                "task_id": task.task_id,
+                "state": task.state,
+                "retry": True,
+                "retry_count": task.retry_count,
+                "failure_reason": result["failure_reason"]
+            }
+
+        return {
+            "task_id": task.task_id,
+            "state": task.state,
+            "retry": False,
+            "retry_count": task.retry_count,
+            "failure_reason": result["failure_reason"]
+        }
