@@ -16,7 +16,7 @@ csv_path = (
 
 output_path = (
     "experiments/results/"
-    "average_execution_time.png"
+    "deadline_success_rate.png"
 )
 
 print()
@@ -29,9 +29,9 @@ print(
 )
 
 print()
-print("Generating Average Execution Time Graph")
+print("Generating Deadline Success Rate Graph")
 
-generated_path = graphs.plot_average_execution_time(
+generated_path = graphs.plot_deadline_success_rate(
     csv_path,
     output_path
 )
@@ -74,8 +74,8 @@ if (
     correct_scenario_count
     and valid_file
 ):
-    print("Experiment Graph Test: PASSED")
+    print("Deadline Success Rate Graph Test: PASSED")
 else:
-    print("Experiment Graph Test: FAILED")
+    print("Deadline Success Rate Graph Test: FAILED")
 
 print("=" * 60)

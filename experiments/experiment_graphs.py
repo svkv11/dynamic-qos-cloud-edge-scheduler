@@ -32,6 +32,9 @@ class ExperimentGraphs:
                     ),
                     "average_qos_score": float(
                         row["average_qos_score"]
+                    ),
+                    "deadline_success_rate": float(
+                        row["deadline_success_rate"]
                     )
                 })
 
@@ -135,6 +138,63 @@ class ExperimentGraphs:
         plt.title(
             "Average Execution Time Across Experiment Scenarios"
         )
+
+        plt.tight_layout()
+
+        plt.savefig(
+            output_path,
+            dpi=300
+        )
+
+        plt.close()
+
+        return output_path
+
+    def plot_deadline_success_rate(
+        self,
+        csv_path,
+        output_path
+    ):
+        """
+        Generate a deadline success rate comparison chart.
+        """
+
+        results = self.load_results(csv_path)
+
+        scenarios = [
+            result["scenario"]
+            for result in results
+        ]
+
+        deadline_success_rates = [
+            result["deadline_success_rate"]
+            for result in results
+        ]
+
+        output_directory = os.path.dirname(
+            output_path
+        )
+
+        if output_directory:
+            os.makedirs(
+                output_directory,
+                exist_ok=True
+            )
+
+        plt.figure(figsize=(8, 5))
+
+        plt.bar(
+            scenarios,
+            deadline_success_rates
+        )
+
+        plt.xlabel("Scenario")
+        plt.ylabel("Deadline Success Rate (%)")
+        plt.title(
+            "Deadline Success Rate Across Experiment Scenarios"
+        )
+
+        plt.ylim(0, 100)
 
         plt.tight_layout()
 
