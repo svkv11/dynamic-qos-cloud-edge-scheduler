@@ -1,15 +1,24 @@
+from scheduler.metrics import MetricsCollector
+
+
 class SchedulingController:
     def __init__(
         self,
         scheduler,
         executor,
         worker_manager,
-        resource_monitor=None
+        resource_monitor=None,
+        metrics_collector=None
     ):
         self.scheduler = scheduler
         self.executor = executor
         self.worker_manager = worker_manager
         self.resource_monitor = resource_monitor
+
+        if metrics_collector is None:
+            self.metrics_collector = MetricsCollector()
+        else:
+            self.metrics_collector = metrics_collector
 
         self.active_tasks = []
         self.completed_tasks = []
@@ -110,6 +119,22 @@ class SchedulingController:
 
             worker.task_finished()
 
+            task = task_state["task"]
+            node = task_state["node"]
+
+            qos_score = self.scheduler.calculate_task_score(
+                node,
+                task
+            )
+
+            self.metrics_collector.record_task(
+                task=task,
+                node=node,
+                execution_time=result["execution_time"],
+                deadline_met=result["deadline_met"],
+                qos_score=qos_score
+            )
+
             if result["state"] == "COMPLETED":
                 self.completed_tasks.append(result)
                 completed_count += 1
@@ -172,6 +197,13 @@ class SchedulingController:
         """
 
         return len(self.failed_tasks)
+
+    def get_metrics(self):
+        """
+        Return the MetricsCollector used by the controller.
+        """
+
+        return self.metrics_collector
 
     def display_status(self):
         """
