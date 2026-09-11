@@ -3,11 +3,13 @@ class SchedulingController:
         self,
         scheduler,
         executor,
-        worker_manager
+        worker_manager,
+        resource_monitor=None
     ):
         self.scheduler = scheduler
         self.executor = executor
         self.worker_manager = worker_manager
+        self.resource_monitor = resource_monitor
 
         self.active_tasks = []
         self.completed_tasks = []
@@ -20,10 +22,25 @@ class SchedulingController:
 
         self.worker_manager.start_all()
 
+    def get_current_node_states(self):
+        """
+        Return the latest resource state of all nodes.
+
+        ResourceMonitor is used when available.
+        """
+
+        if self.resource_monitor is None:
+            return []
+
+        return self.resource_monitor.get_all_node_states()
+
     def schedule_pending_tasks(self):
         """
         Schedule as many pending tasks as possible
         using currently READY workers.
+
+        The scheduler uses the nodes whose workers
+        are currently available.
         """
 
         scheduled_count = 0
@@ -107,8 +124,8 @@ class SchedulingController:
 
         1. Schedule pending tasks
         2. Complete active tasks
-        3. Retry any remaining pending tasks
-        4. Repeat until no pending or active tasks remain
+        3. Continue scheduling remaining tasks
+        4. Stop when no progress can be made
         """
 
         total_completed = 0
