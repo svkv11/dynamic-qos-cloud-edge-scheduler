@@ -5,6 +5,7 @@ from scheduler.task_executor import TaskExecutor
 from scheduler.worker import Worker
 from scheduler.worker_manager import WorkerManager
 from scheduler.scheduling_controller import SchedulingController
+from scheduler.resource_monitor import ResourceMonitor
 
 
 def create_nodes():
@@ -99,19 +100,12 @@ def create_tasks():
     ]
 
 
-# ---------------------------------------------------------
-# Create infrastructure
-# ---------------------------------------------------------
-
 nodes = create_nodes()
 
 scheduler = QoSScheduler(nodes)
 executor = TaskExecutor()
 
-
-# ---------------------------------------------------------
-# Create workers
-# ---------------------------------------------------------
+resource_monitor = ResourceMonitor(nodes)
 
 workers = [
     Worker("worker-01", nodes[0]),
@@ -119,62 +113,40 @@ workers = [
     Worker("worker-03", nodes[2])
 ]
 
-
-# ---------------------------------------------------------
-# Create Worker Manager
-# ---------------------------------------------------------
-
 worker_manager = WorkerManager(workers)
-
-
-# ---------------------------------------------------------
-# Create Scheduling Controller
-# ---------------------------------------------------------
 
 controller = SchedulingController(
     scheduler=scheduler,
     executor=executor,
-    worker_manager=worker_manager
+    worker_manager=worker_manager,
+    resource_monitor=resource_monitor
 )
 
-
-# ---------------------------------------------------------
-# Start system
-# ---------------------------------------------------------
-
 controller.start_workers()
-
 
 print("=" * 60)
 print("DYNAMIC QOS CLOUD-EDGE SCHEDULER")
 print("=" * 60)
 
+print()
+print("=" * 60)
+print("INITIAL RESOURCE MONITOR STATE")
+print("=" * 60)
 
-# ---------------------------------------------------------
-# Display worker information
-# ---------------------------------------------------------
+resource_monitor.display_status()
 
 print()
 worker_manager.display_status()
 
-
-# ---------------------------------------------------------
-# Create and queue tasks
-# ---------------------------------------------------------
-
 tasks = create_tasks()
-
 
 print()
 print("=" * 60)
 print("ADDING TASKS TO QUEUE")
 print("=" * 60)
 
-
 for task in tasks:
-
     added = scheduler.add_task(task)
-
     print(
         f"{task.task_id} | "
         f"Priority={task.priority} | "
@@ -182,17 +154,11 @@ for task in tasks:
         f"Added={added}"
     )
 
-
 print()
 print(
     f"Pending Tasks: "
     f"{scheduler.pending_task_count()}"
 )
-
-
-# ---------------------------------------------------------
-# Display controller status
-# ---------------------------------------------------------
 
 print()
 print("=" * 60)
@@ -201,23 +167,20 @@ print("=" * 60)
 
 controller.display_status()
 
+print()
+print("=" * 60)
+print("CURRENT NODE STATES THROUGH CONTROLLER")
+print("=" * 60)
 
-# ---------------------------------------------------------
-# Run scheduling cycle
-# ---------------------------------------------------------
+for state in controller.get_current_node_states():
+    print(state)
 
 print()
 print("=" * 60)
 print("RUNNING SCHEDULING CYCLE")
 print("=" * 60)
 
-
 completed_count = controller.run_cycle()
-
-
-# ---------------------------------------------------------
-# Display final controller status
-# ---------------------------------------------------------
 
 print()
 print("=" * 60)
@@ -226,17 +189,11 @@ print("=" * 60)
 
 controller.display_status()
 
-
 print()
 print(
     f"Completed Tasks: "
     f"{completed_count}"
 )
-
-
-# ---------------------------------------------------------
-# Display final worker states
-# ---------------------------------------------------------
 
 print()
 print("=" * 60)
@@ -245,24 +202,20 @@ print("=" * 60)
 
 worker_manager.display_status()
 
+print()
+print("=" * 60)
+print("FINAL RESOURCE MONITOR STATE")
+print("=" * 60)
 
-# ---------------------------------------------------------
-# Display final node states
-# ---------------------------------------------------------
+resource_monitor.display_status()
 
 print()
 print("=" * 60)
 print("FINAL NODE STATES")
 print("=" * 60)
 
-
 for node in nodes:
     node.display_info()
-
-
-# ---------------------------------------------------------
-# Final result
-# ---------------------------------------------------------
 
 print()
 print("=" * 60)
