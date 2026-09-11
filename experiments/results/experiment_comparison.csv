@@ -1,0 +1,5 @@
+scenario,completed_tasks,failed_tasks,deadline_success_rate,average_execution_time,average_qos_score
+normal,4,0,100.0,7.67,73.52
+high_cpu,4,0,100.0,9.55,72.39
+high_memory,4,0,100.0,7.67,77.73
+high_latency,4,0,100.0,8.55,76.73
