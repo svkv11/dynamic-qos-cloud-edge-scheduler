@@ -6,17 +6,46 @@ from scheduler.worker import Worker
 from scheduler.worker_manager import WorkerManager
 from scheduler.scheduling_controller import SchedulingController
 
+from experiments.experiment_scenarios import ExperimentScenarios
+
 
 class ExperimentRunner:
     """
     Run controlled scheduler experiments and collect results.
     """
 
-    def create_nodes(self):
+    def get_scenario_conditions(self, scenario_name):
         """
-        Create the standard cloud-edge node configuration
-        used for experiments.
+        Return resource conditions for the requested scenario.
         """
+
+        scenarios = {
+            "normal": ExperimentScenarios.normal,
+            "high_cpu": ExperimentScenarios.high_cpu,
+            "high_memory": ExperimentScenarios.high_memory,
+            "high_latency": ExperimentScenarios.high_latency
+        }
+
+        if scenario_name not in scenarios:
+            raise ValueError(
+                f"Unknown scenario: {scenario_name}. "
+                f"Available scenarios: {list(scenarios.keys())}"
+            )
+
+        return scenarios[scenario_name]()
+
+    def create_nodes(self, resource_conditions=None):
+        """
+        Create the standard cloud-edge node configuration.
+
+        Dynamic resource values are taken from the selected
+        experiment scenario.
+        """
+
+        if resource_conditions is None:
+            resource_conditions = (
+                ExperimentScenarios.normal()
+            )
 
         return [
             ComputeNode(
@@ -25,10 +54,18 @@ class ExperimentRunner:
                 cpu_cores=4,
                 memory_gb=8,
                 gpu_available=False,
-                cpu_utilization=25.0,
-                memory_utilization=30.0,
-                gpu_utilization=0.0,
-                network_latency_ms=10.0
+                cpu_utilization=resource_conditions["edge-01"][
+                    "cpu_utilization"
+                ],
+                memory_utilization=resource_conditions["edge-01"][
+                    "memory_utilization"
+                ],
+                gpu_utilization=resource_conditions["edge-01"][
+                    "gpu_utilization"
+                ],
+                network_latency_ms=resource_conditions["edge-01"][
+                    "network_latency_ms"
+                ]
             ),
             ComputeNode(
                 node_id="edge-02",
@@ -36,10 +73,18 @@ class ExperimentRunner:
                 cpu_cores=8,
                 memory_gb=16,
                 gpu_available=True,
-                cpu_utilization=40.0,
-                memory_utilization=45.0,
-                gpu_utilization=20.0,
-                network_latency_ms=15.0
+                cpu_utilization=resource_conditions["edge-02"][
+                    "cpu_utilization"
+                ],
+                memory_utilization=resource_conditions["edge-02"][
+                    "memory_utilization"
+                ],
+                gpu_utilization=resource_conditions["edge-02"][
+                    "gpu_utilization"
+                ],
+                network_latency_ms=resource_conditions["edge-02"][
+                    "network_latency_ms"
+                ]
             ),
             ComputeNode(
                 node_id="cloud-01",
@@ -47,10 +92,18 @@ class ExperimentRunner:
                 cpu_cores=16,
                 memory_gb=32,
                 gpu_available=True,
-                cpu_utilization=55.0,
-                memory_utilization=50.0,
-                gpu_utilization=35.0,
-                network_latency_ms=80.0
+                cpu_utilization=resource_conditions["cloud-01"][
+                    "cpu_utilization"
+                ],
+                memory_utilization=resource_conditions["cloud-01"][
+                    "memory_utilization"
+                ],
+                gpu_utilization=resource_conditions["cloud-01"][
+                    "gpu_utilization"
+                ],
+                network_latency_ms=resource_conditions["cloud-01"][
+                    "network_latency_ms"
+                ]
             )
         ]
 
@@ -99,14 +152,22 @@ class ExperimentRunner:
             )
         ]
 
-    def run_experiment(self):
+    def run_experiment(self, scenario_name="normal"):
         """
-        Run one standard scheduler experiment.
+        Run one scheduler experiment using the selected
+        resource scenario.
 
-        Returns the collected experiment metrics.
+        Returns the collected experiment metrics and
+        node-selection information.
         """
 
-        nodes = self.create_nodes()
+        resource_conditions = self.get_scenario_conditions(
+            scenario_name
+        )
+
+        nodes = self.create_nodes(
+            resource_conditions
+        )
 
         scheduler = QoSScheduler(nodes)
         executor = TaskExecutor()
@@ -129,7 +190,19 @@ class ExperimentRunner:
 
         tasks = self.create_tasks()
 
+        initial_rankings = {}
+
         for task in tasks:
+            rankings = scheduler.get_node_rankings(task)
+
+            initial_rankings[task.task_id] = [
+                {
+                    "node_id": item["node"].node_id,
+                    "final_score": item["final_score"]
+                }
+                for item in rankings
+            ]
+
             scheduler.add_task(task)
 
         completed = controller.run_cycle()
@@ -137,6 +210,7 @@ class ExperimentRunner:
         metrics = controller.get_metrics()
 
         return {
+            "scenario": scenario_name,
             "completed_during_cycle": completed,
             "total_tasks": metrics.get_total_tasks(),
             "completed_tasks": metrics.get_completed_tasks(),
@@ -150,7 +224,8 @@ class ExperimentRunner:
             "average_qos_score": (
                 metrics.get_average_qos_score()
             ),
-            "node_usage": metrics.get_node_usage()
+            "node_usage": metrics.get_node_usage(),
+            "initial_rankings": initial_rankings
         }
 
     def display_result(self, result):
@@ -161,6 +236,11 @@ class ExperimentRunner:
         print("=" * 60)
         print("EXPERIMENT RESULT")
         print("=" * 60)
+
+        print(
+            f"Scenario: "
+            f"{result['scenario']}"
+        )
 
         print(
             f"Completed During Cycle: "
@@ -203,6 +283,24 @@ class ExperimentRunner:
             print(
                 f"  {node_id}: "
                 f"{count} task(s)"
+            )
+
+        print()
+        print("Initial Node Rankings:")
+
+        for task_id, rankings in result[
+            "initial_rankings"
+        ].items():
+
+            ranking_text = " > ".join(
+                f"{item['node_id']} "
+                f"({item['final_score']})"
+                for item in rankings
+            )
+
+            print(
+                f"  {task_id}: "
+                f"{ranking_text}"
             )
 
         print("=" * 60)
