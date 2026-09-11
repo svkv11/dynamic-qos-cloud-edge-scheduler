@@ -100,11 +100,38 @@ def create_tasks():
     ]
 
 
+def display_rankings(scheduler, task, title):
+    """
+    Display QoS rankings for a task.
+    """
+
+    print()
+    print("=" * 60)
+    print(title)
+    print("=" * 60)
+
+    rankings = scheduler.get_node_rankings(task)
+
+    if not rankings:
+        print("No feasible nodes available.")
+        return None
+
+    for ranking in rankings:
+        print(
+            f"{ranking['node'].node_id} | "
+            f"Resource={ranking['resource_score']} | "
+            f"Priority={ranking['priority_score']} | "
+            f"Deadline={ranking['deadline_score']} | "
+            f"Final={ranking['final_score']}"
+        )
+
+    return rankings[0]["node"]
+
+
 nodes = create_nodes()
 
 scheduler = QoSScheduler(nodes)
 executor = TaskExecutor()
-
 resource_monitor = ResourceMonitor(nodes)
 
 workers = [
@@ -135,10 +162,72 @@ print("=" * 60)
 
 resource_monitor.display_status()
 
-print()
-worker_manager.display_status()
-
 tasks = create_tasks()
+
+dynamic_task = tasks[0]
+
+initial_best_node = display_rankings(
+    scheduler,
+    dynamic_task,
+    "INITIAL QOS RANKINGS"
+)
+
+print()
+print(
+    f"Initial Best Node for {dynamic_task.task_id}: "
+    f"{initial_best_node.node_id}"
+)
+
+print()
+print("=" * 60)
+print("SIMULATING RESOURCE CONDITION CHANGE")
+print("=" * 60)
+
+print("Updating edge-02 with higher resource utilization...")
+
+resource_monitor.refresh_node_state(
+    node_id="edge-02",
+    cpu_utilization=85.0,
+    memory_utilization=80.0,
+    gpu_utilization=70.0,
+    network_latency_ms=50.0
+)
+
+resource_monitor.display_status()
+
+updated_best_node = display_rankings(
+    scheduler,
+    dynamic_task,
+    "UPDATED QOS RANKINGS"
+)
+
+print()
+
+if updated_best_node is not None:
+    print(
+        f"Updated Best Node for {dynamic_task.task_id}: "
+        f"{updated_best_node.node_id}"
+    )
+
+print()
+print("=" * 60)
+print("DYNAMIC ADAPTATION RESULT")
+print("=" * 60)
+
+if (
+    initial_best_node is not None
+    and updated_best_node is not None
+    and initial_best_node.node_id != updated_best_node.node_id
+):
+    print("Scheduler adapted to the changed resource conditions.")
+    print(
+        f"Before: {initial_best_node.node_id}"
+    )
+    print(
+        f"After:  {updated_best_node.node_id}"
+    )
+else:
+    print("Scheduler did not change its selected node.")
 
 print()
 print("=" * 60)
@@ -147,6 +236,7 @@ print("=" * 60)
 
 for task in tasks:
     added = scheduler.add_task(task)
+
     print(
         f"{task.task_id} | "
         f"Priority={task.priority} | "
@@ -159,21 +249,6 @@ print(
     f"Pending Tasks: "
     f"{scheduler.pending_task_count()}"
 )
-
-print()
-print("=" * 60)
-print("INITIAL CONTROLLER STATUS")
-print("=" * 60)
-
-controller.display_status()
-
-print()
-print("=" * 60)
-print("CURRENT NODE STATES THROUGH CONTROLLER")
-print("=" * 60)
-
-for state in controller.get_current_node_states():
-    print(state)
 
 print()
 print("=" * 60)
@@ -190,12 +265,6 @@ print("=" * 60)
 controller.display_status()
 
 print()
-print(
-    f"Completed Tasks: "
-    f"{completed_count}"
-)
-
-print()
 print("=" * 60)
 print("FINAL WORKER STATES")
 print("=" * 60)
@@ -208,14 +277,6 @@ print("FINAL RESOURCE MONITOR STATE")
 print("=" * 60)
 
 resource_monitor.display_status()
-
-print()
-print("=" * 60)
-print("FINAL NODE STATES")
-print("=" * 60)
-
-for node in nodes:
-    node.display_info()
 
 print()
 print("=" * 60)
@@ -240,6 +301,11 @@ print(
 print(
     f"Remaining Pending Tasks: "
     f"{scheduler.pending_task_count()}"
+)
+
+print(
+    f"Scheduling Cycle Completed: "
+    f"{completed_count}"
 )
 
 print("=" * 60)
