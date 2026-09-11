@@ -27,6 +27,9 @@ class ExperimentGraphs:
             for row in reader:
                 results.append({
                     "scenario": row["scenario"],
+                    "average_execution_time": float(
+                        row["average_execution_time"]
+                    ),
                     "average_qos_score": float(
                         row["average_qos_score"]
                     )
@@ -76,6 +79,61 @@ class ExperimentGraphs:
         plt.ylabel("Average QoS Score")
         plt.title(
             "Average QoS Score Across Experiment Scenarios"
+        )
+
+        plt.tight_layout()
+
+        plt.savefig(
+            output_path,
+            dpi=300
+        )
+
+        plt.close()
+
+        return output_path
+
+    def plot_average_execution_time(
+        self,
+        csv_path,
+        output_path
+    ):
+        """
+        Generate an average execution time comparison chart.
+        """
+
+        results = self.load_results(csv_path)
+
+        scenarios = [
+            result["scenario"]
+            for result in results
+        ]
+
+        execution_times = [
+            result["average_execution_time"]
+            for result in results
+        ]
+
+        output_directory = os.path.dirname(
+            output_path
+        )
+
+        if output_directory:
+            os.makedirs(
+                output_directory,
+                exist_ok=True
+            )
+
+        plt.figure(figsize=(8, 5))
+
+        plt.bar(
+            scenarios,
+            execution_times
+        )
+
+        plt.xlabel("Scenario")
+        plt.ylabel("Average Execution Time (seconds)")
+        plt.title(
+            "Average Execution Time Across Experiment Scenarios"
         )
 
         plt.tight_layout()

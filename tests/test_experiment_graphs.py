@@ -16,7 +16,7 @@ csv_path = (
 
 output_path = (
     "experiments/results/"
-    "average_qos_score.png"
+    "average_execution_time.png"
 )
 
 print()
@@ -29,9 +29,9 @@ print(
 )
 
 print()
-print("Generating Average QoS Graph")
+print("Generating Average Execution Time Graph")
 
-generated_path = graphs.plot_average_qos(
+generated_path = graphs.plot_average_execution_time(
     csv_path,
     output_path
 )
