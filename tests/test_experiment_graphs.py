@@ -16,7 +16,7 @@ csv_path = (
 
 output_path = (
     "experiments/results/"
-    "deadline_success_rate.png"
+    "node_usage.png"
 )
 
 print()
@@ -29,9 +29,9 @@ print(
 )
 
 print()
-print("Generating Deadline Success Rate Graph")
+print("Generating Node Usage Graph")
 
-generated_path = graphs.plot_deadline_success_rate(
+generated_path = graphs.plot_node_usage(
     csv_path,
     output_path
 )
@@ -74,8 +74,8 @@ if (
     correct_scenario_count
     and valid_file
 ):
-    print("Deadline Success Rate Graph Test: PASSED")
+    print("Node Usage Graph Test: PASSED")
 else:
-    print("Deadline Success Rate Graph Test: FAILED")
+    print("Node Usage Graph Test: FAILED")
 
 print("=" * 60)

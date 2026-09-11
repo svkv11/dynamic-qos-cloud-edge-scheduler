@@ -35,6 +35,15 @@ class ExperimentGraphs:
                     ),
                     "deadline_success_rate": float(
                         row["deadline_success_rate"]
+                    ),
+                    "edge_01_usage": int(
+                        row["edge_01_usage"]
+                    ),
+                    "edge_02_usage": int(
+                        row["edge_02_usage"]
+                    ),
+                    "cloud_01_usage": int(
+                        row["cloud_01_usage"]
                     )
                 })
 
@@ -195,6 +204,107 @@ class ExperimentGraphs:
         )
 
         plt.ylim(0, 100)
+
+        plt.tight_layout()
+
+        plt.savefig(
+            output_path,
+            dpi=300
+        )
+
+        plt.close()
+
+        return output_path
+
+    def plot_node_usage(
+        self,
+        csv_path,
+        output_path
+    ):
+        """
+        Generate a node usage comparison chart.
+
+        The chart shows how many tasks were handled
+        by each node under every experiment scenario.
+        """
+
+        results = self.load_results(csv_path)
+
+        scenarios = [
+            result["scenario"]
+            for result in results
+        ]
+
+        edge_01_usage = [
+            result["edge_01_usage"]
+            for result in results
+        ]
+
+        edge_02_usage = [
+            result["edge_02_usage"]
+            for result in results
+        ]
+
+        cloud_01_usage = [
+            result["cloud_01_usage"]
+            for result in results
+        ]
+
+        output_directory = os.path.dirname(
+            output_path
+        )
+
+        if output_directory:
+            os.makedirs(
+                output_directory,
+                exist_ok=True
+            )
+
+        x_positions = range(len(scenarios))
+
+        bar_width = 0.25
+
+        plt.figure(figsize=(9, 5))
+
+        plt.bar(
+            [
+                position - bar_width
+                for position in x_positions
+            ],
+            edge_01_usage,
+            width=bar_width,
+            label="edge-01"
+        )
+
+        plt.bar(
+            x_positions,
+            edge_02_usage,
+            width=bar_width,
+            label="edge-02"
+        )
+
+        plt.bar(
+            [
+                position + bar_width
+                for position in x_positions
+            ],
+            cloud_01_usage,
+            width=bar_width,
+            label="cloud-01"
+        )
+
+        plt.xlabel("Scenario")
+        plt.ylabel("Number of Tasks")
+        plt.title(
+            "Node Usage Across Experiment Scenarios"
+        )
+
+        plt.xticks(
+            list(x_positions),
+            scenarios
+        )
+
+        plt.legend()
 
         plt.tight_layout()
 
