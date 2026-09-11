@@ -80,6 +80,30 @@ class NodeSelectionAnalyzer:
             )
         )
 
+    def get_selection_adaptation_rate(
+        self,
+        selection_matrix
+    ):
+        """
+        Calculate the percentage of tasks whose selected
+        node changed across the experiment scenarios.
+        """
+
+        total_tasks = len(selection_matrix)
+
+        if total_tasks == 0:
+            return 0.0
+
+        changed_tasks = self.get_selection_change_count(
+            selection_matrix
+        )
+
+        adaptation_rate = (
+            changed_tasks / total_tasks
+        ) * 100
+
+        return round(adaptation_rate, 2)
+
     def display_selection_matrix(
         self,
         selection_matrix
@@ -141,5 +165,30 @@ class NodeSelectionAnalyzer:
                         f"  {scenario_name:<15} -> "
                         f"{node_id}"
                     )
+
+        print("=" * 80)
+
+    def display_adaptation_rate(
+        self,
+        selection_matrix
+    ):
+        """
+        Display the overall node selection adaptation rate.
+        """
+
+        adaptation_rate = (
+            self.get_selection_adaptation_rate(
+                selection_matrix
+            )
+        )
+
+        print("=" * 80)
+        print("NODE SELECTION ADAPTATION RATE")
+        print("=" * 80)
+
+        print(
+            f"Adaptation Rate: "
+            f"{adaptation_rate}%"
+        )
 
         print("=" * 80)

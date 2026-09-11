@@ -58,9 +58,27 @@ analyzer.display_changed_tasks(
 )
 
 print()
+print("Calculating Adaptation Rate")
+
+adaptation_rate = (
+    analyzer.get_selection_adaptation_rate(
+        selection_matrix
+    )
+)
+
+analyzer.display_adaptation_rate(
+    selection_matrix
+)
+
+print()
 print(
     f"Tasks With Selection Changes: "
     f"{change_count}"
+)
+
+print(
+    f"Node Selection Adaptation Rate: "
+    f"{adaptation_rate}%"
 )
 
 print()
@@ -76,14 +94,19 @@ correct_task_count = (
     len(selection_matrix) == 4
 )
 
-selection_changed = (
-    change_count > 0
+correct_change_count = (
+    change_count == 3
+)
+
+correct_adaptation_rate = (
+    adaptation_rate == 75.0
 )
 
 if (
     correct_scenario_count
     and correct_task_count
-    and selection_changed
+    and correct_change_count
+    and correct_adaptation_rate
 ):
     print("Node Selection Analysis Test: PASSED")
 else:
