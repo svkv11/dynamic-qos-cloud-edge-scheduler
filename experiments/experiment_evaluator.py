@@ -9,17 +9,27 @@ class ExperimentEvaluator:
     def __init__(self):
         self.runner = ExperimentRunner()
 
-    def run_all_scenarios(self):
+    def get_scenario_names(self):
         """
-        Run all predefined resource scenarios.
+        Return all predefined experiment scenarios.
         """
 
-        scenario_names = [
+        return [
             "normal",
             "high_cpu",
             "high_memory",
-            "high_latency"
+            "high_latency",
+            "tight_deadline",
+            "priority_conflict",
+            "resource_deadline_pressure"
         ]
+
+    def run_all_scenarios(self):
+        """
+        Run all predefined experiment scenarios.
+        """
+
+        scenario_names = self.get_scenario_names()
 
         results = {}
 
@@ -96,12 +106,12 @@ class ExperimentEvaluator:
         Display a readable comparison of all scenarios.
         """
 
-        print("=" * 80)
+        print("=" * 90)
         print("SCHEDULER EXPERIMENT COMPARISON")
-        print("=" * 80)
+        print("=" * 90)
 
         print(
-            f"{'Scenario':<15}"
+            f"{'Scenario':<30}"
             f"{'Completed':<12}"
             f"{'Failed':<10}"
             f"{'Deadline %':<13}"
@@ -109,12 +119,12 @@ class ExperimentEvaluator:
             f"{'Avg QoS':<10}"
         )
 
-        print("-" * 80)
+        print("-" * 90)
 
         for scenario_name, result in comparison.items():
 
             print(
-                f"{scenario_name:<15}"
+                f"{scenario_name:<30}"
                 f"{result['completed_tasks']:<12}"
                 f"{result['failed_tasks']:<10}"
                 f"{result['deadline_success_rate']:<13}"
@@ -122,7 +132,7 @@ class ExperimentEvaluator:
                 f"{result['average_qos_score']:<10}"
             )
 
-        print("=" * 80)
+        print("=" * 90)
 
         print(
             f"Best QoS Scenario: "
@@ -134,4 +144,4 @@ class ExperimentEvaluator:
             f"{self.get_fastest_scenario(comparison)}"
         )
 
-        print("=" * 80)
+        print("=" * 90)

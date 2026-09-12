@@ -23,7 +23,12 @@ class ExperimentRunner:
             "normal": ExperimentScenarios.normal,
             "high_cpu": ExperimentScenarios.high_cpu,
             "high_memory": ExperimentScenarios.high_memory,
-            "high_latency": ExperimentScenarios.high_latency
+            "high_latency": ExperimentScenarios.high_latency,
+            "tight_deadline": ExperimentScenarios.tight_deadline,
+            "priority_conflict":
+                ExperimentScenarios.priority_conflict,
+            "resource_deadline_pressure":
+                ExperimentScenarios.resource_deadline_pressure
         }
 
         if scenario_name not in scenarios:
@@ -33,6 +38,16 @@ class ExperimentRunner:
             )
 
         return scenarios[scenario_name]()
+
+    def get_task_profile(self, scenario_name):
+        """
+        Return the workload profile associated with
+        the selected experiment scenario.
+        """
+
+        return ExperimentScenarios.get_task_profile(
+            scenario_name
+        )
 
     def create_nodes(self, resource_conditions=None):
         """
@@ -107,61 +122,150 @@ class ExperimentRunner:
             )
         ]
 
-    def create_tasks(self):
+    def create_tasks(self, task_profile="normal"):
         """
-        Create a standard heterogeneous workload
-        for the experiment.
+        Create the heterogeneous workload associated
+        with the selected experiment profile.
         """
 
-        return [
-            Task(
-                task_id="task-01",
-                workload_type="cpu_intensive",
-                cpu_required=2,
-                memory_required_gb=2,
-                gpu_required=False,
-                deadline_seconds=60,
-                priority=2
-            ),
-            Task(
-                task_id="task-02",
-                workload_type="memory_intensive",
-                cpu_required=2,
-                memory_required_gb=4,
-                gpu_required=False,
-                deadline_seconds=60,
-                priority=3
-            ),
-            Task(
-                task_id="task-03",
-                workload_type="gpu_intensive",
-                cpu_required=4,
-                memory_required_gb=8,
-                gpu_required=True,
-                deadline_seconds=30,
-                priority=4
-            ),
-            Task(
-                task_id="task-04",
-                workload_type="latency_sensitive",
-                cpu_required=1,
-                memory_required_gb=2,
-                gpu_required=False,
-                deadline_seconds=15,
-                priority=5
-            )
-        ]
+        if task_profile == "normal":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=2
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=3
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=30,
+                    priority=4
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=15,
+                    priority=5
+                )
+            ]
+
+        if task_profile == "tight_deadline":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=6,
+                    priority=2
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=7,
+                    priority=3
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=8,
+                    priority=4
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=4,
+                    priority=5
+                )
+            ]
+
+        if task_profile == "priority_conflict":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=5
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=1
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=30,
+                    priority=5
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=15,
+                    priority=1
+                )
+            ]
+
+        raise ValueError(
+            f"Unknown task profile: {task_profile}"
+        )
 
     def run_experiment(self, scenario_name="normal"):
         """
         Run one scheduler experiment using the selected
-        resource scenario.
+        resource scenario and workload profile.
 
         Returns the collected experiment metrics and
         node-selection information.
         """
 
         resource_conditions = self.get_scenario_conditions(
+            scenario_name
+        )
+
+        task_profile = self.get_task_profile(
             scenario_name
         )
 
@@ -188,7 +292,9 @@ class ExperimentRunner:
 
         controller.start_workers()
 
-        tasks = self.create_tasks()
+        tasks = self.create_tasks(
+            task_profile
+        )
 
         initial_rankings = {}
 
@@ -211,6 +317,7 @@ class ExperimentRunner:
 
         return {
             "scenario": scenario_name,
+            "task_profile": task_profile,
             "completed_during_cycle": completed,
             "total_tasks": metrics.get_total_tasks(),
             "completed_tasks": metrics.get_completed_tasks(),
@@ -240,6 +347,11 @@ class ExperimentRunner:
         print(
             f"Scenario: "
             f"{result['scenario']}"
+        )
+
+        print(
+            f"Task Profile: "
+            f"{result['task_profile']}"
         )
 
         print(

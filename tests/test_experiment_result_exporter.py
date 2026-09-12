@@ -42,6 +42,8 @@ print("Checking CSV File")
 
 file_exists = os.path.exists(exported_path)
 
+content = ""
+
 if file_exists:
     print("CSV File Exists: True")
 
@@ -70,7 +72,10 @@ expected_scenarios = {
     "normal",
     "high_cpu",
     "high_memory",
-    "high_latency"
+    "high_latency",
+    "tight_deadline",
+    "priority_conflict",
+    "resource_deadline_pressure"
 }
 
 all_scenarios_present = (
@@ -78,16 +83,35 @@ all_scenarios_present = (
     == expected_scenarios
 )
 
-correct_row_count = (
-    content.count("\n") == 5
+csv_lines = (
+    content.strip().splitlines()
     if file_exists
-    else False
+    else []
+)
+
+correct_row_count = (
+    len(csv_lines) == 8
+)
+
+header_present = (
+    file_exists
+    and csv_lines
+    and csv_lines[0].startswith(
+        "scenario,completed_tasks,failed_tasks"
+    )
+)
+
+all_scenarios_exported = all(
+    scenario in content
+    for scenario in expected_scenarios
 )
 
 if (
     file_exists
     and all_scenarios_present
     and correct_row_count
+    and header_present
+    and all_scenarios_exported
 ):
     print("Experiment Result Exporter Test: PASSED")
 else:

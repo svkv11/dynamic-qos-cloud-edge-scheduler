@@ -18,7 +18,11 @@ class BaselineExperiment:
             "normal": ExperimentScenarios.normal,
             "high_cpu": ExperimentScenarios.high_cpu,
             "high_memory": ExperimentScenarios.high_memory,
-            "high_latency": ExperimentScenarios.high_latency
+            "high_latency": ExperimentScenarios.high_latency,
+            "tight_deadline": ExperimentScenarios.tight_deadline,
+            "priority_conflict": ExperimentScenarios.priority_conflict,
+            "resource_deadline_pressure":
+                ExperimentScenarios.resource_deadline_pressure
         }
 
         if scenario_name not in scenarios:
@@ -28,6 +32,11 @@ class BaselineExperiment:
             )
 
         return scenarios[scenario_name]()
+
+    def get_task_profile(self, scenario_name):
+        return ExperimentScenarios.get_task_profile(
+            scenario_name
+        )
 
     def create_nodes(self, resource_conditions):
         return [
@@ -90,45 +99,130 @@ class BaselineExperiment:
             )
         ]
 
-    def create_tasks(self):
-        return [
-            Task(
-                task_id="task-01",
-                workload_type="cpu_intensive",
-                cpu_required=2,
-                memory_required_gb=2,
-                gpu_required=False,
-                deadline_seconds=60,
-                priority=2
-            ),
-            Task(
-                task_id="task-02",
-                workload_type="memory_intensive",
-                cpu_required=2,
-                memory_required_gb=4,
-                gpu_required=False,
-                deadline_seconds=60,
-                priority=3
-            ),
-            Task(
-                task_id="task-03",
-                workload_type="gpu_intensive",
-                cpu_required=4,
-                memory_required_gb=8,
-                gpu_required=True,
-                deadline_seconds=30,
-                priority=4
-            ),
-            Task(
-                task_id="task-04",
-                workload_type="latency_sensitive",
-                cpu_required=1,
-                memory_required_gb=2,
-                gpu_required=False,
-                deadline_seconds=15,
-                priority=5
-            )
-        ]
+    def create_tasks(self, task_profile="normal"):
+        if task_profile == "normal":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=2
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=3
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=30,
+                    priority=4
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=15,
+                    priority=5
+                )
+            ]
+
+        if task_profile == "tight_deadline":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=6,
+                    priority=2
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=7,
+                    priority=3
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=8,
+                    priority=4
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=4,
+                    priority=5
+                )
+            ]
+
+        if task_profile == "priority_conflict":
+            return [
+                Task(
+                    task_id="task-01",
+                    workload_type="cpu_intensive",
+                    cpu_required=2,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=5
+                ),
+                Task(
+                    task_id="task-02",
+                    workload_type="memory_intensive",
+                    cpu_required=2,
+                    memory_required_gb=4,
+                    gpu_required=False,
+                    deadline_seconds=60,
+                    priority=1
+                ),
+                Task(
+                    task_id="task-03",
+                    workload_type="gpu_intensive",
+                    cpu_required=4,
+                    memory_required_gb=8,
+                    gpu_required=True,
+                    deadline_seconds=30,
+                    priority=5
+                ),
+                Task(
+                    task_id="task-04",
+                    workload_type="latency_sensitive",
+                    cpu_required=1,
+                    memory_required_gb=2,
+                    gpu_required=False,
+                    deadline_seconds=15,
+                    priority=1
+                )
+            ]
+
+        raise ValueError(
+            f"Unknown task profile: {task_profile}"
+        )
 
     def execute_assignment(
         self,
@@ -181,8 +275,12 @@ class BaselineExperiment:
             scenario_name
         )
 
+        task_profile = self.get_task_profile(
+            scenario_name
+        )
+
         nodes = self.create_nodes(conditions)
-        tasks = self.create_tasks()
+        tasks = self.create_tasks(task_profile)
 
         scheduler = BaselineScheduler(nodes)
 
@@ -213,8 +311,12 @@ class BaselineExperiment:
             scenario_name
         )
 
+        task_profile = self.get_task_profile(
+            scenario_name
+        )
+
         nodes = self.create_nodes(conditions)
-        tasks = self.create_tasks()
+        tasks = self.create_tasks(task_profile)
 
         scheduler = BaselineScheduler(nodes)
 
@@ -246,8 +348,12 @@ class BaselineExperiment:
             scenario_name
         )
 
+        task_profile = self.get_task_profile(
+            scenario_name
+        )
+
         nodes = self.create_nodes(conditions)
-        tasks = self.create_tasks()
+        tasks = self.create_tasks(task_profile)
 
         scheduler = QoSScheduler(nodes)
 

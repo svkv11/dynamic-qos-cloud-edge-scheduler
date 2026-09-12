@@ -62,7 +62,7 @@ print("TEST RESULT")
 print("=" * 60)
 
 correct_scenario_count = (
-    len(results) == 4
+    len(results) == 7
 )
 
 valid_file = (
