@@ -104,6 +104,82 @@ class NodeSelectionAnalyzer:
 
         return round(adaptation_rate, 2)
 
+    def compare_scenarios(
+        self,
+        selection_matrix,
+        base_scenario,
+        comparison_scenario
+    ):
+        """
+        Compare task selections between two scenarios.
+
+        Returns the selection for each task in both
+        scenarios and whether the selection changed.
+        """
+
+        comparison = {}
+
+        for task_id, scenario_selections in (
+            selection_matrix.items()
+        ):
+
+            base_node = scenario_selections.get(
+                base_scenario
+            )
+
+            comparison_node = scenario_selections.get(
+                comparison_scenario
+            )
+
+            comparison[task_id] = {
+                "base_node": base_node,
+                "comparison_node": comparison_node,
+                "changed": (
+                    base_node != comparison_node
+                )
+            }
+
+        return comparison
+
+    def get_scenario_change_count(
+        self,
+        comparison
+    ):
+        """
+        Count how many tasks changed node selection
+        between two scenarios.
+        """
+
+        return sum(
+            1
+            for result in comparison.values()
+            if result["changed"]
+        )
+
+    def get_scenario_adaptation_rate(
+        self,
+        comparison
+    ):
+        """
+        Calculate the percentage of tasks that changed
+        node selection between two scenarios.
+        """
+
+        total_tasks = len(comparison)
+
+        if total_tasks == 0:
+            return 0.0
+
+        changed_tasks = self.get_scenario_change_count(
+            comparison
+        )
+
+        adaptation_rate = (
+            changed_tasks / total_tasks
+        ) * 100
+
+        return round(adaptation_rate, 2)
+
     def display_selection_matrix(
         self,
         selection_matrix
@@ -190,5 +266,39 @@ class NodeSelectionAnalyzer:
             f"Adaptation Rate: "
             f"{adaptation_rate}%"
         )
+
+        print("=" * 80)
+
+    def display_scenario_comparison(
+        self,
+        comparison,
+        base_scenario,
+        comparison_scenario
+    ):
+        """
+        Display task selection changes between two scenarios.
+        """
+
+        print("=" * 80)
+        print(
+            f"SCENARIO COMPARISON: "
+            f"{base_scenario} -> {comparison_scenario}"
+        )
+        print("=" * 80)
+
+        for task_id, result in comparison.items():
+
+            status = (
+                "CHANGED"
+                if result["changed"]
+                else "UNCHANGED"
+            )
+
+            print(
+                f"{task_id:<12} "
+                f"{result['base_node']} -> "
+                f"{result['comparison_node']} | "
+                f"{status}"
+            )
 
         print("=" * 80)
