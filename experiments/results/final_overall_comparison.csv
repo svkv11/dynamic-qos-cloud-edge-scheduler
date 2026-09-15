@@ -1,0 +1,4 @@
+scheduler,total_tasks,completed_tasks,failed_tasks,deadline_success_rate,average_execution_time,average_qos
+Round Robin,60,56,4,93.33,14.07,73.23
+Resource Only,60,58,2,96.67,12.73,75.61
+GenAI + Dynamic QoS,60,58,2,96.67,10.11,87.81
