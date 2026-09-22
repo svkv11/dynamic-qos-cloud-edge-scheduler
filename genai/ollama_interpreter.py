@@ -74,23 +74,37 @@ IMPORTANT RESOURCE RULES:
   a time limit.
 - If the user does not provide one of these values, return null.
 - GPU can be inferred from the nature of the workload.
-  For example, AI image generation or deep learning normally
-  requires GPU acceleration.
+- For gpu_intensive workloads, gpu_required MUST be true.
+- For cpu_intensive, memory_intensive, latency_sensitive,
+  and general workloads, gpu_required MUST be false unless
+  the user explicitly requires a GPU.
 
-Return ONLY valid JSON.
-Do not include explanations.
-Do not use Markdown.
+OUTPUT FORMAT:
+
+Return ONLY valid JSON using exactly these fields:
+
+{
+  "workload_type": "general",
+  "gpu_required": false,
+  "priority": 3,
+  "deadline_seconds": null,
+  "explicit_cpu_required": null,
+  "explicit_memory_required_gb": null
+}
+
+IMPORTANT:
+
+- gpu_required MUST always be either true or false.
+- NEVER return null for gpu_required.
+- Do not omit any field.
+- Do not include explanations.
+- Do not use Markdown.
 """
 
     def __init__(self):
         self.model = self.MODEL
 
     def interpret(self, user_request):
-        """
-        Convert a natural-language request into
-        a validated TaskRequirements object.
-        """
-
         prompt = f"""
 {self.SYSTEM_PROMPT}
 
@@ -136,14 +150,10 @@ User request:
             if lines and lines[-1].strip() == "```":
                 lines = lines[:-1]
 
-            llm_output = "\n".join(
-                lines
-            ).strip()
+            llm_output = "\n".join(lines).strip()
 
         try:
-            data = json.loads(
-                llm_output
-            )
+            data = json.loads(llm_output)
 
         except json.JSONDecodeError as error:
             raise ValueError(
@@ -167,10 +177,6 @@ User request:
                     f"field: {field}"
                 )
 
-        # --------------------------------------------------
-        # Normalize GPU value
-        # --------------------------------------------------
-
         gpu_required = data["gpu_required"]
 
         if isinstance(gpu_required, str):
@@ -182,26 +188,32 @@ User request:
             elif gpu_value == "false":
                 gpu_required = False
 
+            elif gpu_value in {"null", "none", ""}:
+                gpu_required = None
+
             else:
                 raise ValueError(
                     "Qwen returned an invalid gpu_required value: "
                     f"{gpu_required}"
                 )
 
-        elif not isinstance(gpu_required, bool):
+        elif gpu_required is not None and not isinstance(
+            gpu_required,
+            bool
+        ):
             raise ValueError(
                 "Qwen returned an invalid gpu_required value: "
                 f"{gpu_required}"
             )
 
-        # --------------------------------------------------
-        # Create TaskRequirements
-        # --------------------------------------------------
+        if gpu_required is None:
+            if data["workload_type"] == "gpu_intensive":
+                gpu_required = True
+            else:
+                gpu_required = False
 
         requirements = TaskRequirements(
-            workload_type=data[
-                "workload_type"
-            ],
+            workload_type=data["workload_type"],
             cpu_required=(
                 data["explicit_cpu_required"]
                 if data["explicit_cpu_required"] is not None
@@ -213,18 +225,9 @@ User request:
                 else 1
             ),
             gpu_required=gpu_required,
-            deadline_seconds=data[
-                "deadline_seconds"
-            ],
-            priority=data[
-                "priority"
-            ]
+            deadline_seconds=data["deadline_seconds"],
+            priority=data["priority"]
         )
-
-        # --------------------------------------------------
-        # Apply workload defaults
-        # while preserving explicit values
-        # --------------------------------------------------
 
         requirements = WorkloadProfiler.apply_profile(
             requirements=requirements,
