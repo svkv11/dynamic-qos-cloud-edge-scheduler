@@ -2,466 +2,563 @@ import csv
 import os
 
 
+# ---------------------------------------------------------
+# PROJECT PATHS
+# ---------------------------------------------------------
+
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
 RESULTS_DIR = os.path.join(
+    PROJECT_ROOT,
     "experiments",
     "results"
 )
 
+INPUT_CSV = os.path.join(
+    RESULTS_DIR,
+    "genai_stress_results.csv"
+)
+
+STRESS_OUTPUT_CSV = os.path.join(
+    RESULTS_DIR,
+    "final_stress_results.csv"
+)
+
+OVERALL_OUTPUT_CSV = os.path.join(
+    RESULTS_DIR,
+    "final_overall_comparison.csv"
+)
+
 
 # ---------------------------------------------------------
-# FINAL STEP 17 RESULTS
+# SCHEDULER ORDER
 # ---------------------------------------------------------
 
-RESULTS = [
-    {
-        "scenario": "Normal Mixed Workload",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 13.66,
-        "average_qos": 70.81
-    },
-    {
-        "scenario": "Normal Mixed Workload",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 13.06,
-        "average_qos": 73.53
-    },
-    {
-        "scenario": "Normal Mixed Workload",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 9.32,
-        "average_qos": 87.80
-    },
-
-    {
-        "scenario": "High CPU Pressure",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 16.65,
-        "average_qos": 72.37
-    },
-    {
-        "scenario": "High CPU Pressure",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 20.21,
-        "average_qos": 73.11
-    },
-    {
-        "scenario": "High CPU Pressure",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 13.09,
-        "average_qos": 85.56
-    },
-
-    {
-        "scenario": "High Memory Pressure",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 19.00,
-        "average_qos": 74.98
-    },
-    {
-        "scenario": "High Memory Pressure",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 14.60,
-        "average_qos": 81.30
-    },
-    {
-        "scenario": "High Memory Pressure",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 14.60,
-        "average_qos": 83.01
-    },
-
-    {
-        "scenario": "GPU Heavy",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 10.75,
-        "average_qos": 68.74
-    },
-    {
-        "scenario": "GPU Heavy",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 6.90,
-        "average_qos": 69.02
-    },
-    {
-        "scenario": "GPU Heavy",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 6.90,
-        "average_qos": 88.20
-    },
-
-    {
-        "scenario": "Tight Deadlines",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 6,
-        "failed_tasks": 4,
-        "deadline_success_rate": 60.0,
-        "average_execution_time": 11.42,
-        "average_qos": 77.44
-    },
-    {
-        "scenario": "Tight Deadlines",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 8,
-        "failed_tasks": 2,
-        "deadline_success_rate": 80.0,
-        "average_execution_time": 9.98,
-        "average_qos": 80.42
-    },
-    {
-        "scenario": "Tight Deadlines",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 8,
-        "failed_tasks": 2,
-        "deadline_success_rate": 80.0,
-        "average_execution_time": 8.01,
-        "average_qos": 93.95
-    },
-
-    {
-        "scenario": "Priority Conflict",
-        "scheduler": "Round Robin",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 12.95,
-        "average_qos": 75.06
-    },
-    {
-        "scenario": "Priority Conflict",
-        "scheduler": "Resource Only",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 11.63,
-        "average_qos": 76.29
-    },
-    {
-        "scenario": "Priority Conflict",
-        "scheduler": "GenAI + Dynamic QoS",
-        "total_tasks": 10,
-        "completed_tasks": 10,
-        "failed_tasks": 0,
-        "deadline_success_rate": 100.0,
-        "average_execution_time": 8.73,
-        "average_qos": 88.31
-    }
+SCHEDULERS = [
+    "Round Robin",
+    "Resource Only",
+    "GenAI + Dynamic QoS"
 ]
 
 
 # ---------------------------------------------------------
-# CREATE RESULTS DIRECTORY
+# LOAD ACTUAL EXPERIMENT RESULTS
 # ---------------------------------------------------------
 
-os.makedirs(
-    RESULTS_DIR,
-    exist_ok=True
-)
+def load_results():
+    """
+    Load the actual results generated by
+    services.genai_stress_evaluation.
+    """
+
+    if not os.path.exists(INPUT_CSV):
+        raise FileNotFoundError(
+            f"Actual experiment results not found:\n"
+            f"{INPUT_CSV}\n\n"
+            f"Run this first:\n"
+            f"python -m services.genai_stress_evaluation"
+        )
+
+    results = []
+
+    with open(
+        INPUT_CSV,
+        "r",
+        newline="",
+        encoding="utf-8"
+    ) as file:
+
+        reader = csv.DictReader(file)
+
+        required_fields = [
+            "scenario",
+            "scheduler",
+            "total_tasks",
+            "completed_tasks",
+            "failed_tasks",
+            "deadline_success_rate",
+            "average_execution_time",
+            "average_qos"
+        ]
+
+        missing_fields = [
+            field
+            for field in required_fields
+            if field not in reader.fieldnames
+        ]
+
+        if missing_fields:
+            raise ValueError(
+                "Input CSV is missing required fields: "
+                + ", ".join(missing_fields)
+            )
+
+        for row in reader:
+
+            results.append({
+                "scenario": row["scenario"],
+                "scheduler": row["scheduler"],
+                "total_tasks": int(row["total_tasks"]),
+                "completed_tasks": int(row["completed_tasks"]),
+                "failed_tasks": int(row["failed_tasks"]),
+                "deadline_success_rate": float(
+                    row["deadline_success_rate"]
+                ),
+                "average_execution_time": float(
+                    row["average_execution_time"]
+                ),
+                "average_qos": float(
+                    row["average_qos"]
+                )
+            })
+
+    if len(results) != 18:
+        raise ValueError(
+            f"Expected 18 results "
+            f"(6 scenarios × 3 schedulers), "
+            f"but found {len(results)}."
+        )
+
+    return results
+
+
+# ---------------------------------------------------------
+# VALIDATE RESULTS
+# ---------------------------------------------------------
+
+def validate_results(results):
+
+    scenarios = sorted(
+        set(
+            row["scenario"]
+            for row in results
+        )
+    )
+
+    if len(scenarios) != 6:
+        raise ValueError(
+            f"Expected 6 scenarios, "
+            f"but found {len(scenarios)}: {scenarios}"
+        )
+
+    for scenario in scenarios:
+
+        scenario_rows = [
+            row
+            for row in results
+            if row["scenario"] == scenario
+        ]
+
+        if len(scenario_rows) != 3:
+            raise ValueError(
+                f"Scenario '{scenario}' does not contain "
+                f"exactly 3 scheduler results."
+            )
+
+        scenario_schedulers = {
+            row["scheduler"]
+            for row in scenario_rows
+        }
+
+        if scenario_schedulers != set(SCHEDULERS):
+            raise ValueError(
+                f"Scenario '{scenario}' has unexpected "
+                f"schedulers: {scenario_schedulers}"
+            )
 
 
 # ---------------------------------------------------------
 # SAVE FINAL STRESS RESULTS
 # ---------------------------------------------------------
 
-stress_csv = os.path.join(
-    RESULTS_DIR,
-    "final_stress_results.csv"
-)
+def save_final_stress_results(results):
 
-fieldnames = [
-    "scenario",
-    "scheduler",
-    "total_tasks",
-    "completed_tasks",
-    "failed_tasks",
-    "deadline_success_rate",
-    "average_execution_time",
-    "average_qos"
-]
+    fieldnames = [
+        "scenario",
+        "scheduler",
+        "total_tasks",
+        "completed_tasks",
+        "failed_tasks",
+        "deadline_success_rate",
+        "average_execution_time",
+        "average_qos"
+    ]
 
-with open(
-    stress_csv,
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
+    with open(
+        STRESS_OUTPUT_CSV,
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as file:
 
-    writer = csv.DictWriter(
-        file,
-        fieldnames=fieldnames
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fieldnames
+        )
+
+        writer.writeheader()
+
+        for row in results:
+
+            writer.writerow({
+                "scenario": row["scenario"],
+                "scheduler": row["scheduler"],
+                "total_tasks": row["total_tasks"],
+                "completed_tasks": row["completed_tasks"],
+                "failed_tasks": row["failed_tasks"],
+                "deadline_success_rate": round(
+                    row["deadline_success_rate"],
+                    2
+                ),
+                "average_execution_time": round(
+                    row["average_execution_time"],
+                    2
+                ),
+                "average_qos": round(
+                    row["average_qos"],
+                    2
+                )
+            })
+
+    print(
+        f"Final stress results saved: "
+        f"{STRESS_OUTPUT_CSV}"
     )
-
-    writer.writeheader()
-    writer.writerows(RESULTS)
 
 
 # ---------------------------------------------------------
 # CALCULATE OVERALL RESULTS
 # ---------------------------------------------------------
 
-schedulers = [
-    "Round Robin",
-    "Resource Only",
-    "GenAI + Dynamic QoS"
-]
+def calculate_overall_results(results):
 
-overall = {}
+    overall = {}
 
-for scheduler in schedulers:
+    for scheduler in SCHEDULERS:
 
-    rows = [
-        row
-        for row in RESULTS
-        if row["scheduler"] == scheduler
-    ]
+        rows = [
+            row
+            for row in results
+            if row["scheduler"] == scheduler
+        ]
 
-    average_execution = sum(
-        row["average_execution_time"]
-        for row in rows
-    ) / len(rows)
+        if not rows:
+            raise ValueError(
+                f"No results found for scheduler: {scheduler}"
+            )
 
-    average_qos = sum(
-        row["average_qos"]
-        for row in rows
-    ) / len(rows)
-
-    average_deadline = sum(
-        row["deadline_success_rate"]
-        for row in rows
-    ) / len(rows)
-
-    total_tasks = sum(
-        row["total_tasks"]
-        for row in rows
-    )
-
-    completed_tasks = sum(
-        row["completed_tasks"]
-        for row in rows
-    )
-
-    failed_tasks = sum(
-        row["failed_tasks"]
-        for row in rows
-    )
-
-    overall[scheduler] = {
-        "scheduler": scheduler,
-        "total_tasks": total_tasks,
-        "completed_tasks": completed_tasks,
-        "failed_tasks": failed_tasks,
-        "deadline_success_rate": round(
-            average_deadline,
-            2
-        ),
-        "average_execution_time": round(
-            average_execution,
-            2
-        ),
-        "average_qos": round(
-            average_qos,
-            2
+        total_tasks = sum(
+            row["total_tasks"]
+            for row in rows
         )
-    }
+
+        completed_tasks = sum(
+            row["completed_tasks"]
+            for row in rows
+        )
+
+        failed_tasks = sum(
+            row["failed_tasks"]
+            for row in rows
+        )
+
+        # Each scenario contains 10 tasks, so averaging the
+        # six scenario-level rates is equivalent to task-weighted
+        # averaging for this experiment.
+        deadline_success_rate = (
+            sum(
+                row["deadline_success_rate"]
+                for row in rows
+            )
+            / len(rows)
+        )
+
+        average_execution_time = (
+            sum(
+                row["average_execution_time"]
+                for row in rows
+            )
+            / len(rows)
+        )
+
+        average_qos = (
+            sum(
+                row["average_qos"]
+                for row in rows
+            )
+            / len(rows)
+        )
+
+        overall[scheduler] = {
+            "scheduler": scheduler,
+            "total_tasks": total_tasks,
+            "completed_tasks": completed_tasks,
+            "failed_tasks": failed_tasks,
+            "deadline_success_rate": round(
+                deadline_success_rate,
+                2
+            ),
+            "average_execution_time": round(
+                average_execution_time,
+                2
+            ),
+            "average_qos": round(
+                average_qos,
+                2
+            )
+        }
+
+    return overall
 
 
 # ---------------------------------------------------------
 # SAVE OVERALL COMPARISON
 # ---------------------------------------------------------
 
-overall_csv = os.path.join(
-    RESULTS_DIR,
-    "final_overall_comparison.csv"
-)
+def save_overall_results(overall):
 
-overall_fields = [
-    "scheduler",
-    "total_tasks",
-    "completed_tasks",
-    "failed_tasks",
-    "deadline_success_rate",
-    "average_execution_time",
-    "average_qos"
-]
+    fieldnames = [
+        "scheduler",
+        "total_tasks",
+        "completed_tasks",
+        "failed_tasks",
+        "deadline_success_rate",
+        "average_execution_time",
+        "average_qos"
+    ]
 
-with open(
-    overall_csv,
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
+    with open(
+        OVERALL_OUTPUT_CSV,
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as file:
 
-    writer = csv.DictWriter(
-        file,
-        fieldnames=overall_fields
-    )
-
-    writer.writeheader()
-
-    for scheduler in schedulers:
-        writer.writerow(
-            overall[scheduler]
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fieldnames
         )
+
+        writer.writeheader()
+
+        for scheduler in SCHEDULERS:
+
+            writer.writerow(
+                overall[scheduler]
+            )
+
+    print(
+        f"Overall comparison saved: "
+        f"{OVERALL_OUTPUT_CSV}"
+    )
 
 
 # ---------------------------------------------------------
 # CALCULATE IMPROVEMENTS
 # ---------------------------------------------------------
 
-rr = overall["Round Robin"]
-resource = overall["Resource Only"]
-genai = overall["GenAI + Dynamic QoS"]
+def calculate_improvements(overall):
 
-execution_improvement_rr = (
-    (rr["average_execution_time"]
-     - genai["average_execution_time"])
-    / rr["average_execution_time"]
-) * 100
+    rr = overall["Round Robin"]
 
-execution_improvement_resource = (
-    (resource["average_execution_time"]
-     - genai["average_execution_time"])
-    / resource["average_execution_time"]
-) * 100
+    resource = overall["Resource Only"]
 
-qos_improvement_rr = (
-    (genai["average_qos"]
-     - rr["average_qos"])
-    / rr["average_qos"]
-) * 100
+    genai = overall["GenAI + Dynamic QoS"]
 
-qos_improvement_resource = (
-    (genai["average_qos"]
-     - resource["average_qos"])
-    / resource["average_qos"]
-) * 100
+    execution_improvement_rr = (
+        (
+            rr["average_execution_time"]
+            - genai["average_execution_time"]
+        )
+        / rr["average_execution_time"]
+    ) * 100
+
+    execution_improvement_resource = (
+        (
+            resource["average_execution_time"]
+            - genai["average_execution_time"]
+        )
+        / resource["average_execution_time"]
+    ) * 100
+
+    qos_improvement_rr = (
+        (
+            genai["average_qos"]
+            - rr["average_qos"]
+        )
+        / rr["average_qos"]
+    ) * 100
+
+    qos_improvement_resource = (
+        (
+            genai["average_qos"]
+            - resource["average_qos"]
+        )
+        / resource["average_qos"]
+    ) * 100
+
+    return {
+        "execution_improvement_rr":
+            execution_improvement_rr,
+
+        "execution_improvement_resource":
+            execution_improvement_resource,
+
+        "qos_improvement_rr":
+            qos_improvement_rr,
+
+        "qos_improvement_resource":
+            qos_improvement_resource
+    }
 
 
 # ---------------------------------------------------------
 # DISPLAY FINAL RESULTS
 # ---------------------------------------------------------
 
-print()
-print("=" * 80)
-print("STEP 18 - FINAL EXPERIMENTAL RESULTS")
-print("=" * 80)
+def display_results(overall, improvements):
 
-print()
+    print()
+    print("=" * 80)
+    print("FINAL EXPERIMENTAL RESULTS")
+    print("=" * 80)
 
-print(
-    f"{'Scheduler':<28}"
-    f"{'Avg Time':<15}"
-    f"{'Avg QoS':<15}"
-    f"{'Deadline %':<15}"
-)
-
-print("-" * 73)
-
-for scheduler in schedulers:
-
-    result = overall[scheduler]
+    print()
 
     print(
-        f"{scheduler:<28}"
-        f"{result['average_execution_time']:<15}"
-        f"{result['average_qos']:<15}"
-        f"{result['deadline_success_rate']:<15}"
+        f"{'Scheduler':<28}"
+        f"{'Tasks':<10}"
+        f"{'Completed':<12}"
+        f"{'Failed':<10}"
+        f"{'Avg Time':<12}"
+        f"{'Avg QoS':<12}"
+        f"{'Deadline %':<12}"
+    )
+
+    print("-" * 96)
+
+    for scheduler in SCHEDULERS:
+
+        result = overall[scheduler]
+
+        print(
+            f"{scheduler:<28}"
+            f"{result['total_tasks']:<10}"
+            f"{result['completed_tasks']:<12}"
+            f"{result['failed_tasks']:<10}"
+            f"{result['average_execution_time']:<12}"
+            f"{result['average_qos']:<12}"
+            f"{result['deadline_success_rate']:<12}"
+        )
+
+    print()
+
+    print("=" * 80)
+    print("GENAI + DYNAMIC QoS COMPARISON")
+    print("=" * 80)
+
+    print(
+        f"Execution time improvement vs Round Robin: "
+        f"{improvements['execution_improvement_rr']:.2f}%"
+    )
+
+    print(
+        f"Execution time improvement vs Resource Only: "
+        f"{improvements['execution_improvement_resource']:.2f}%"
+    )
+
+    print(
+        f"QoS improvement vs Round Robin: "
+        f"{improvements['qos_improvement_rr']:.2f}%"
+    )
+
+    print(
+        f"QoS improvement vs Resource Only: "
+        f"{improvements['qos_improvement_resource']:.2f}%"
+    )
+
+    print()
+
+    print("=" * 80)
+    print("FILES CREATED")
+    print("=" * 80)
+
+    print(
+        f"Final stress results:\n"
+        f"{STRESS_OUTPUT_CSV}"
+    )
+
+    print()
+
+    print(
+        f"Overall comparison:\n"
+        f"{OVERALL_OUTPUT_CSV}"
+    )
+
+    print("=" * 80)
+    print("FINAL RESULTS GENERATION COMPLETED SUCCESSFULLY")
+    print("=" * 80)
+
+
+# ---------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------
+
+def main():
+
+    print("=" * 80)
+    print("FINAL RESULTS GENERATION")
+    print("=" * 80)
+
+    print()
+
+    print(
+        f"Loading actual experiment results:\n"
+        f"{INPUT_CSV}"
+    )
+
+    results = load_results()
+
+    print(
+        f"Loaded {len(results)} actual experiment results."
+    )
+
+    validate_results(results)
+
+    print(
+        "Result validation passed."
+    )
+
+    os.makedirs(
+        RESULTS_DIR,
+        exist_ok=True
+    )
+
+    save_final_stress_results(
+        results
+    )
+
+    overall = calculate_overall_results(
+        results
+    )
+
+    save_overall_results(
+        overall
+    )
+
+    improvements = calculate_improvements(
+        overall
+    )
+
+    display_results(
+        overall,
+        improvements
     )
 
 
-print()
-print("=" * 80)
-print("GENAI + DYNAMIC QoS IMPROVEMENT")
-print("=" * 80)
-
-print(
-    f"Execution time improvement vs Round Robin: "
-    f"{execution_improvement_rr:.2f}%"
-)
-
-print(
-    f"Execution time improvement vs Resource Only: "
-    f"{execution_improvement_resource:.2f}%"
-)
-
-print(
-    f"QoS improvement vs Round Robin: "
-    f"{qos_improvement_rr:.2f}%"
-)
-
-print(
-    f"QoS improvement vs Resource Only: "
-    f"{qos_improvement_resource:.2f}%"
-)
-
-
-print()
-print("=" * 80)
-print("FILES CREATED")
-print("=" * 80)
-
-print(
-    f"Stress results: "
-    f"{stress_csv}"
-)
-
-print(
-    f"Overall comparison: "
-    f"{overall_csv}"
-)
-
-print("=" * 80)
-print("STEP 18 COMPLETED SUCCESSFULLY")
-print("=" * 80)
+if __name__ == "__main__":
+    main()

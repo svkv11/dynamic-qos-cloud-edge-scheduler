@@ -1,3 +1,4 @@
+import csv
 import os
 import sys
 
@@ -22,6 +23,18 @@ from services.scheduling_pipeline import SchedulingPipeline
 from services.workload_profiler import WorkloadProfiler
 from services.llm_requirement_interpreter import (
     LLMRequirementInterpreter
+)
+
+
+RESULTS_DIR = os.path.join(
+    PROJECT_ROOT,
+    "experiments",
+    "results"
+)
+
+RESULTS_CSV = os.path.join(
+    RESULTS_DIR,
+    "genai_stress_results.csv"
 )
 
 
@@ -97,8 +110,9 @@ def interpret_requests(requests):
     Convert natural-language requests into structured
     scheduling requirements.
 
-    This is done once so all schedulers receive the
-    same workload requirements.
+    This is done once so the Round Robin and Resource Only
+    baselines receive the same interpreted workload
+    requirements.
     """
 
     tasks = []
@@ -470,7 +484,7 @@ def print_summary(
     print(
         f"{'Failed':<30}"
         f"{summaries['Round Robin']['failed']:<20}"
-        f"{summaries['GenAI + QoS']['failed']:<20}"
+        f"{summaries['Resource Only']['failed']:<20}"
         f"{summaries['GenAI + QoS']['failed']:<20}"
     )
 
@@ -498,96 +512,81 @@ def print_summary(
     print("=" * 95)
 
 
-def run_scenario(
-    scenario_name,
-    requests
+def save_results_csv(
+    all_results
 ):
     """
-    Execute one complete stress scenario.
+    Save the actual measured experiment results.
+
+    This replaces manually entered stress-test values with
+    results generated directly from the executable experiment.
     """
 
+    os.makedirs(
+        RESULTS_DIR,
+        exist_ok=True
+    )
+
+    fieldnames = [
+        "scenario",
+        "scheduler",
+        "total_tasks",
+        "completed_tasks",
+        "failed_tasks",
+        "deadline_success_rate",
+        "average_execution_time",
+        "average_qos"
+    ]
+
+    scheduler_mapping = [
+        ("Round Robin", "Round Robin"),
+        ("Resource Only", "Resource Only"),
+        ("GenAI + QoS", "GenAI + Dynamic QoS")
+    ]
+
+    with open(
+        RESULTS_CSV,
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as file:
+
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fieldnames
+        )
+
+        writer.writeheader()
+
+        for scenario_name, summaries in all_results.items():
+
+            for summary_key, csv_scheduler_name in scheduler_mapping:
+
+                summary = summaries[
+                    summary_key
+                ]
+
+                writer.writerow({
+                    "scenario": scenario_name,
+                    "scheduler": csv_scheduler_name,
+                    "total_tasks": summary["total"],
+                    "completed_tasks": summary["completed"],
+                    "failed_tasks": summary["failed"],
+                    "deadline_success_rate":
+                        summary["deadline_rate"],
+                    "average_execution_time":
+                        summary["average_execution_time"],
+                    "average_qos":
+                        summary["average_qos"]
+                })
+
     print()
-    print("=" * 95)
-
     print(
-        f"STARTING SCENARIO: {scenario_name}"
+        f"Actual experiment results saved to:"
     )
-
-    print("=" * 95)
-
     print(
-        f"Number of workloads: "
-        f"{len(requests)}"
+        RESULTS_CSV
     )
-
-    include_memory_edge_node = (
-        scenario_name == "High Memory Pressure"
-    )
-
-    if include_memory_edge_node:
-        print()
-        print(
-            "Memory-capable edge node enabled:"
-        )
-        print(
-            "edge-03 | 12 CPU cores | "
-            "24 GB RAM | 20 ms latency"
-        )
-
-    print()
-    print(
-        "Interpreting natural-language workloads..."
-    )
-
-    task_information = interpret_requests(
-        requests
-    )
-
-    print(
-        "Running Round Robin..."
-    )
-
-    round_robin_results = run_round_robin(
-        task_information,
-        include_memory_edge_node
-    )
-
-    print(
-        "Running Resource Only..."
-    )
-
-    resource_only_results = run_resource_only(
-        task_information,
-        include_memory_edge_node
-    )
-
-    print(
-        "Running GenAI + Dynamic QoS..."
-    )
-
-    genai_results = run_genai(
-        requests,
-        include_memory_edge_node
-    )
-
-    summaries = {
-        "Round Robin": calculate_summary(
-            round_robin_results
-        ),
-        "Resource Only": calculate_summary(
-            resource_only_results
-        ),
-        "GenAI + QoS": calculate_summary(
-            genai_results
-        )
-    }
-
-    print_summary(
-        scenario_name,
-        summaries
-    )
-
-    return summaries
 
 
 def main():
@@ -734,10 +733,108 @@ def main():
 
     print("=" * 110)
 
+    save_results_csv(
+        all_results
+    )
+
     print()
     print(
         "STEP 17 MEMORY-AWARE EVALUATION COMPLETED"
     )
+
+    return all_results
+
+
+def run_scenario(
+    scenario_name,
+    requests
+):
+    """
+    Execute one complete stress scenario.
+    """
+
+    print()
+    print("=" * 95)
+
+    print(
+        f"STARTING SCENARIO: {scenario_name}"
+    )
+
+    print("=" * 95)
+
+    print(
+        f"Number of workloads: "
+        f"{len(requests)}"
+    )
+
+    include_memory_edge_node = (
+        scenario_name == "High Memory Pressure"
+    )
+
+    if include_memory_edge_node:
+        print()
+        print(
+            "Memory-capable edge node enabled:"
+        )
+        print(
+            "edge-03 | 12 CPU cores | "
+            "24 GB RAM | 20 ms latency"
+        )
+
+    print()
+    print(
+        "Interpreting natural-language workloads..."
+    )
+
+    task_information = interpret_requests(
+        requests
+    )
+
+    print(
+        "Running Round Robin..."
+    )
+
+    round_robin_results = run_round_robin(
+        task_information,
+        include_memory_edge_node
+    )
+
+    print(
+        "Running Resource Only..."
+    )
+
+    resource_only_results = run_resource_only(
+        task_information,
+        include_memory_edge_node
+    )
+
+    print(
+        "Running GenAI + Dynamic QoS..."
+    )
+
+    genai_results = run_genai(
+        requests,
+        include_memory_edge_node
+    )
+
+    summaries = {
+        "Round Robin": calculate_summary(
+            round_robin_results
+        ),
+        "Resource Only": calculate_summary(
+            resource_only_results
+        ),
+        "GenAI + QoS": calculate_summary(
+            genai_results
+        )
+    }
+
+    print_summary(
+        scenario_name,
+        summaries
+    )
+
+    return summaries
 
 
 if __name__ == "__main__":

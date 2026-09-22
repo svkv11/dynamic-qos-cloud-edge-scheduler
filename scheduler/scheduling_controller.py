@@ -28,7 +28,6 @@ class SchedulingController:
         """
         Start all workers managed by WorkerManager.
         """
-
         self.worker_manager.start_all()
 
     def get_current_node_states(self):
@@ -37,7 +36,6 @@ class SchedulingController:
 
         ResourceMonitor is used when available.
         """
-
         if self.resource_monitor is None:
             return []
 
@@ -51,7 +49,6 @@ class SchedulingController:
         The scheduler uses the nodes whose workers
         are currently available.
         """
-
         scheduled_count = 0
 
         while self.scheduler.has_pending_tasks():
@@ -103,7 +100,6 @@ class SchedulingController:
 
         Workers become READY after their tasks finish.
         """
-
         completed_count = 0
 
         while self.active_tasks:
@@ -113,19 +109,18 @@ class SchedulingController:
             task_state = active_task["task_state"]
             worker = active_task["worker"]
 
+            task = task_state["task"]
+            node = task_state["node"]
+
+            # QoS was captured when the scheduling decision
+            # was made, before resource allocation.
+            qos_score = task.scheduling_qos_score
+
             result = self.executor.complete_task(
                 task_state
             )
 
             worker.task_finished()
-
-            task = task_state["task"]
-            node = task_state["node"]
-
-            qos_score = self.scheduler.calculate_task_score(
-                node,
-                task
-            )
 
             self.metrics_collector.record_task(
                 task=task,
@@ -152,7 +147,6 @@ class SchedulingController:
         3. Continue scheduling remaining tasks
         4. Stop when no progress can be made
         """
-
         total_completed = 0
 
         while (
@@ -181,35 +175,30 @@ class SchedulingController:
         """
         Return the number of currently active tasks.
         """
-
         return len(self.active_tasks)
 
     def get_completed_task_count(self):
         """
         Return the number of completed tasks.
         """
-
         return len(self.completed_tasks)
 
     def get_failed_task_count(self):
         """
         Return the number of failed tasks.
         """
-
         return len(self.failed_tasks)
 
     def get_metrics(self):
         """
         Return the MetricsCollector used by the controller.
         """
-
         return self.metrics_collector
 
     def display_status(self):
         """
         Display the current scheduling controller status.
         """
-
         print("=" * 60)
         print("SCHEDULING CONTROLLER STATUS")
         print("=" * 60)

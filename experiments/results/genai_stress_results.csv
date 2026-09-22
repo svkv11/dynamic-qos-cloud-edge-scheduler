@@ -1,19 +1,19 @@
 scenario,scheduler,total_tasks,completed_tasks,failed_tasks,deadline_success_rate,average_execution_time,average_qos
-Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,70.81
-Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,73.53
-Normal Mixed Workload,GenAI + Dynamic QoS,10,10,0,100.0,9.32,87.8
-High CPU Pressure,Round Robin,10,10,0,100.0,16.65,72.37
-High CPU Pressure,Resource Only,10,10,0,100.0,20.21,73.11
-High CPU Pressure,GenAI + Dynamic QoS,10,10,0,100.0,13.09,85.56
-High Memory Pressure,Round Robin,10,10,0,100.0,23.4,68.66
-High Memory Pressure,Resource Only,10,10,0,100.0,23.4,68.66
-High Memory Pressure,GenAI + Dynamic QoS,10,10,0,100.0,23.4,66.9
-GPU Heavy,Round Robin,10,10,0,100.0,10.75,68.54
-GPU Heavy,Resource Only,10,10,0,100.0,6.9,68.82
-GPU Heavy,GenAI + Dynamic QoS,10,10,0,100.0,6.9,88.4
-Tight Deadlines,Round Robin,10,6,4,60.0,11.42,77.24
-Tight Deadlines,Resource Only,10,8,2,80.0,9.98,80.22
-Tight Deadlines,GenAI + Dynamic QoS,10,8,2,80.0,8.01,94.15
-Priority Conflict,Round Robin,10,10,0,100.0,12.95,75.06
-Priority Conflict,Resource Only,10,10,0,100.0,11.63,76.29
-Priority Conflict,GenAI + Dynamic QoS,10,10,0,100.0,8.73,88.31
+Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+Normal Mixed Workload,GenAI + Dynamic QoS,10,10,0,100.0,9.32,79.61
+High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+High CPU Pressure,GenAI + Dynamic QoS,10,10,0,100.0,13.09,77.97
+High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+High Memory Pressure,GenAI + Dynamic QoS,10,10,0,100.0,14.6,76.01
+GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.33
+GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.54
+GPU Heavy,GenAI + Dynamic QoS,10,10,0,100.0,6.9,79.92
+Tight Deadlines,Round Robin,10,6,4,60.0,11.42,72.41
+Tight Deadlines,Resource Only,10,8,2,80.0,9.98,75.98
+Tight Deadlines,GenAI + Dynamic QoS,10,8,2,80.0,8.01,84.4
+Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.37
+Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.26
+Priority Conflict,GenAI + Dynamic QoS,10,10,0,100.0,8.73,80.51

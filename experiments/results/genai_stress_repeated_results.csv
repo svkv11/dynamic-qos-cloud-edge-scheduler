@@ -1,0 +1,91 @@
+repetition,scenario,scheduler,total_tasks,completed_tasks,failed_tasks,deadline_success_rate,average_execution_time,average_qos
+1,Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+1,Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+1,Normal Mixed Workload,GenAI + QoS,10,10,0,100.0,9.32,79.61
+1,High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+1,High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+1,High CPU Pressure,GenAI + QoS,10,10,0,100.0,13.09,77.97
+1,High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+1,High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+1,High Memory Pressure,GenAI + QoS,10,10,0,100.0,14.6,76.01
+1,GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.33
+1,GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.54
+1,GPU Heavy,GenAI + QoS,10,10,0,100.0,6.9,79.84
+1,Tight Deadlines,Round Robin,10,6,4,60.0,11.42,71.49
+1,Tight Deadlines,Resource Only,10,8,2,80.0,9.98,75.05
+1,Tight Deadlines,GenAI + QoS,10,8,2,80.0,8.01,84.4
+1,Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.37
+1,Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.26
+1,Priority Conflict,GenAI + QoS,10,10,0,100.0,8.73,80.51
+2,Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+2,Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+2,Normal Mixed Workload,GenAI + QoS,10,10,0,100.0,9.32,79.61
+2,High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+2,High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+2,High CPU Pressure,GenAI + QoS,10,10,0,100.0,13.09,77.97
+2,High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+2,High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+2,High Memory Pressure,GenAI + QoS,10,10,0,100.0,14.6,76.01
+2,GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.67
+2,GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.87
+2,GPU Heavy,GenAI + QoS,10,10,0,100.0,6.9,79.84
+2,Tight Deadlines,Round Robin,10,6,4,60.0,11.42,72.75
+2,Tight Deadlines,Resource Only,10,8,2,80.0,9.98,76.31
+2,Tight Deadlines,GenAI + QoS,10,8,2,80.0,8.01,84.79
+2,Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.37
+2,Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.26
+2,Priority Conflict,GenAI + QoS,10,10,0,100.0,8.73,80.38
+3,Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+3,Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+3,Normal Mixed Workload,GenAI + QoS,10,10,0,100.0,9.32,79.61
+3,High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+3,High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+3,High CPU Pressure,GenAI + QoS,10,10,0,100.0,13.09,77.97
+3,High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+3,High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+3,High Memory Pressure,GenAI + QoS,10,10,0,100.0,14.6,76.01
+3,GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.33
+3,GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.54
+3,GPU Heavy,GenAI + QoS,10,10,0,100.0,6.9,79.84
+3,Tight Deadlines,Round Robin,10,6,4,60.0,11.42,72.41
+3,Tight Deadlines,Resource Only,10,8,2,80.0,9.98,75.98
+3,Tight Deadlines,GenAI + QoS,10,8,2,80.0,8.01,84.4
+3,Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.39
+3,Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.33
+3,Priority Conflict,GenAI + QoS,10,10,0,100.0,8.73,80.51
+4,Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+4,Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+4,Normal Mixed Workload,GenAI + QoS,10,10,0,100.0,9.32,79.61
+4,High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+4,High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+4,High CPU Pressure,GenAI + QoS,10,10,0,100.0,13.09,77.97
+4,High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+4,High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+4,High Memory Pressure,GenAI + QoS,10,10,0,100.0,14.6,76.01
+4,GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.33
+4,GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.54
+4,GPU Heavy,GenAI + QoS,10,10,0,100.0,6.9,79.92
+4,Tight Deadlines,Round Robin,10,6,4,60.0,11.42,72.41
+4,Tight Deadlines,Resource Only,10,8,2,80.0,9.98,75.98
+4,Tight Deadlines,GenAI + QoS,10,8,2,80.0,8.01,84.64
+4,Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.39
+4,Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.33
+4,Priority Conflict,GenAI + QoS,10,10,0,100.0,8.73,80.51
+5,Normal Mixed Workload,Round Robin,10,10,0,100.0,13.66,67.6
+5,Normal Mixed Workload,Resource Only,10,10,0,100.0,13.06,69.64
+5,Normal Mixed Workload,GenAI + QoS,10,10,0,100.0,9.32,79.61
+5,High CPU Pressure,Round Robin,10,10,0,100.0,16.65,68.16
+5,High CPU Pressure,Resource Only,10,10,0,100.0,20.21,68.71
+5,High CPU Pressure,GenAI + QoS,10,10,0,100.0,13.09,77.97
+5,High Memory Pressure,Round Robin,10,10,0,100.0,19.0,69.99
+5,High Memory Pressure,Resource Only,10,10,0,100.0,14.6,74.73
+5,High Memory Pressure,GenAI + QoS,10,10,0,100.0,14.6,76.01
+5,GPU Heavy,Round Robin,10,10,0,100.0,10.75,65.33
+5,GPU Heavy,Resource Only,10,10,0,100.0,6.9,65.54
+5,GPU Heavy,GenAI + QoS,10,10,0,100.0,6.9,79.84
+5,Tight Deadlines,Round Robin,10,6,4,60.0,11.42,71.49
+5,Tight Deadlines,Resource Only,10,8,2,80.0,9.98,75.05
+5,Tight Deadlines,GenAI + QoS,10,8,2,80.0,8.01,83.96
+5,Priority Conflict,Round Robin,10,10,0,100.0,12.95,72.39
+5,Priority Conflict,Resource Only,10,10,0,100.0,11.63,73.33
+5,Priority Conflict,GenAI + QoS,10,10,0,100.0,8.73,80.51

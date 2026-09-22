@@ -1,0 +1,4 @@
+scheduler,observations,mean_execution_time,std_execution_time,mean_qos,std_qos,mean_deadline_success_rate,std_deadline_success_rate
+Round Robin,30,14.07,2.95,69.27,2.55,93.33,15.16
+Resource Only,30,12.73,4.2,71.28,3.65,96.67,7.58
+GenAI + QoS,30,10.11,2.82,79.73,2.62,96.67,7.58

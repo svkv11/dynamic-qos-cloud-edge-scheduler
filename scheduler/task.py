@@ -32,6 +32,9 @@ class Task:
         # Node assigned to the task
         self.assigned_node = None
 
+        # QoS score captured at scheduling time
+        self.scheduling_qos_score = None
+
         # Failure information
         self.failure_reason = None
 
@@ -39,7 +42,6 @@ class Task:
         """
         Move the task from PENDING to RUNNING.
         """
-
         self.state = "RUNNING"
         self.assigned_node = node
         self.failure_reason = None
@@ -48,14 +50,12 @@ class Task:
         """
         Move the task from RUNNING to COMPLETED.
         """
-
         self.state = "COMPLETED"
 
     def fail(self, reason):
         """
         Move the task to FAILED and record the reason.
         """
-
         self.state = "FAILED"
         self.failure_reason = reason
 
@@ -63,7 +63,6 @@ class Task:
         """
         Increment the number of scheduling or execution retries.
         """
-
         self.retry_count += 1
 
     def can_retry(self):
@@ -73,7 +72,6 @@ class Task:
         Returns True while the retry limit has not
         been reached.
         """
-
         return self.retry_count < self.max_retries
 
     def retry(self):
@@ -83,14 +81,13 @@ class Task:
         Returns True if the retry is allowed.
         Returns False if the retry limit has been reached.
         """
-
         if not self.can_retry():
             return False
 
         self.increment_retry()
-
         self.state = "PENDING"
         self.assigned_node = None
+        self.scheduling_qos_score = None
         self.failure_reason = None
 
         return True
@@ -98,17 +95,13 @@ class Task:
     def display_info(self):
         print(f"Task ID: {self.task_id}")
         print(f"Workload Type: {self.workload_type}")
-
         print(f"CPU Required: {self.cpu_required} cores")
         print(f"Memory Required: {self.memory_required_gb} GB")
         print(f"GPU Required: {self.gpu_required}")
-
         print(f"Deadline: {self.deadline_seconds} seconds")
         print(f"Priority: {self.priority}")
-
         print(f"Retry Count: {self.retry_count}")
         print(f"Max Retries: {self.max_retries}")
-
         print(f"State: {self.state}")
 
         if self.assigned_node is not None:
@@ -118,6 +111,11 @@ class Task:
             )
         else:
             print("Assigned Node: None")
+
+        print(
+            f"Scheduling QoS Score: "
+            f"{self.scheduling_qos_score}"
+        )
 
         if self.failure_reason is not None:
             print(
