@@ -2,6 +2,9 @@ from genai.mock_interpreter import MockRequirementInterpreter
 from genai.gemini_interpreter import (
     GeminiRequirementInterpreter
 )
+from genai.ollama_interpreter import (
+    OllamaRequirementInterpreter
+)
 from genai.task_converter import TaskConverter
 from genai.task_validator import TaskRequirementsValidator
 
@@ -10,9 +13,10 @@ class GenAIService:
     """
     Main interface for the GenAI requirement interpretation layer.
 
-    The service can use either:
+    The service can use:
         - MockRequirementInterpreter
         - GeminiRequirementInterpreter
+        - OllamaRequirementInterpreter
 
     The scheduler does not need to know which interpreter
     is being used.
@@ -21,10 +25,16 @@ class GenAIService:
     def __init__(
         self,
         interpreter=None,
-        use_gemini=False
+        use_gemini=False,
+        use_ollama=False
     ):
         if interpreter is not None:
             self.interpreter = interpreter
+
+        elif use_ollama:
+            self.interpreter = (
+                OllamaRequirementInterpreter()
+            )
 
         elif use_gemini:
             self.interpreter = (
@@ -42,7 +52,10 @@ class GenAIService:
         validated TaskRequirements.
         """
 
-        if not isinstance(user_request, str):
+        if not isinstance(
+            user_request,
+            str
+        ):
             raise TypeError(
                 "user_request must be a string."
             )

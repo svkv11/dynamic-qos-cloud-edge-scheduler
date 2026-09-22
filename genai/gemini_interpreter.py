@@ -1,3 +1,4 @@
+
 import json
 import os
 
@@ -19,7 +20,7 @@ class GeminiRequirementInterpreter:
     requirements that the user did not explicitly specify.
     """
 
-    def __init__(self, model="gemini-3.6-flash"):
+    def __init__(self, model="gemini-3.7-flash"):
         api_key = os.getenv("GEMINI_API_KEY")
 
         if not api_key:
