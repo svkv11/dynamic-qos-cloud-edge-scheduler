@@ -1,0 +1,132 @@
+{
+    "total_tasks": 600,
+    "workload_totals": {
+        "memory_intensive": 117,
+        "cpu_intensive": 134,
+        "gpu_intensive": 113,
+        "general": 116,
+        "latency_sensitive": 120
+    },
+    "cloud_selected_as_only_valid_node": 278,
+    "cloud_selected_when_alternatives_available": 219,
+    "cloud_tasks_with_alternatives": 219,
+    "workload_valid_action_analysis": {
+        "cpu_intensive_valid_actions_1": {
+            "workload_type": "cpu_intensive",
+            "valid_action_count": 1,
+            "task_count": 47,
+            "selected_node_counts": {
+                "cloud-01": 47
+            }
+        },
+        "cpu_intensive_valid_actions_2": {
+            "workload_type": "cpu_intensive",
+            "valid_action_count": 2,
+            "task_count": 67,
+            "selected_node_counts": {
+                "edge-02": 14,
+                "cloud-01": 53
+            }
+        },
+        "cpu_intensive_valid_actions_3": {
+            "workload_type": "cpu_intensive",
+            "valid_action_count": 3,
+            "task_count": 20,
+            "selected_node_counts": {
+                "cloud-01": 19,
+                "edge-02": 1
+            }
+        },
+        "general_valid_actions_1": {
+            "workload_type": "general",
+            "valid_action_count": 1,
+            "task_count": 34,
+            "selected_node_counts": {
+                "cloud-01": 34
+            }
+        },
+        "general_valid_actions_2": {
+            "workload_type": "general",
+            "valid_action_count": 2,
+            "task_count": 45,
+            "selected_node_counts": {
+                "cloud-01": 45
+            }
+        },
+        "general_valid_actions_3": {
+            "workload_type": "general",
+            "valid_action_count": 3,
+            "task_count": 37,
+            "selected_node_counts": {
+                "cloud-01": 37
+            }
+        },
+        "gpu_intensive_valid_actions_1": {
+            "workload_type": "gpu_intensive",
+            "valid_action_count": 1,
+            "task_count": 87,
+            "selected_node_counts": {
+                "cloud-01": 87
+            }
+        },
+        "gpu_intensive_valid_actions_2": {
+            "workload_type": "gpu_intensive",
+            "valid_action_count": 2,
+            "task_count": 26,
+            "selected_node_counts": {
+                "cloud-01": 26
+            }
+        },
+        "latency_sensitive_valid_actions_1": {
+            "workload_type": "latency_sensitive",
+            "valid_action_count": 1,
+            "task_count": 37,
+            "selected_node_counts": {
+                "cloud-01": 37
+            }
+        },
+        "latency_sensitive_valid_actions_2": {
+            "workload_type": "latency_sensitive",
+            "valid_action_count": 2,
+            "task_count": 44,
+            "selected_node_counts": {
+                "edge-02": 44
+            }
+        },
+        "latency_sensitive_valid_actions_3": {
+            "workload_type": "latency_sensitive",
+            "valid_action_count": 3,
+            "task_count": 39,
+            "selected_node_counts": {
+                "edge-02": 39
+            }
+        },
+        "memory_intensive_valid_actions_1": {
+            "workload_type": "memory_intensive",
+            "valid_action_count": 1,
+            "task_count": 73,
+            "selected_node_counts": {
+                "cloud-01": 73
+            }
+        },
+        "memory_intensive_valid_actions_2": {
+            "workload_type": "memory_intensive",
+            "valid_action_count": 2,
+            "task_count": 38,
+            "selected_node_counts": {
+                "cloud-01": 34,
+                "edge-02": 4
+            }
+        },
+        "memory_intensive_valid_actions_3": {
+            "workload_type": "memory_intensive",
+            "valid_action_count": 3,
+            "task_count": 6,
+            "selected_node_counts": {
+                "cloud-01": 5,
+                "edge-01": 1
+            }
+        }
+    },
+    "performance_summary_file": "experiments\\results\\dqn_diagnostics\\dqn_performance_by_workload_and_node.csv"
+}

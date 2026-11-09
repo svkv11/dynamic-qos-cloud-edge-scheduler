@@ -1,0 +1,279 @@
+{
+    "checkpoint": "experiments\\results\\dqn\\dqn_model.pt",
+    "training_episodes_in_checkpoint": 1000,
+    "training_seed_in_checkpoint": 42,
+    "evaluation_seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129
+    ],
+    "evaluation_episodes": 30,
+    "tasks_completed": 600,
+    "all_episodes_completed": true,
+    "metrics_are_simulated": true,
+    "exploration_enabled": false,
+    "invalid_actions": 0,
+    "node_selection_counts": {
+        "cloud-01": 497,
+        "edge-02": 102,
+        "edge-01": 1
+    },
+    "workload_counts": {
+        "memory_intensive": 117,
+        "cpu_intensive": 134,
+        "gpu_intensive": 113,
+        "general": 116,
+        "latency_sensitive": 120
+    },
+    "workload_node_selection": {
+        "memory_intensive": {
+            "cloud-01": 112,
+            "edge-02": 4,
+            "edge-01": 1
+        },
+        "cpu_intensive": {
+            "cloud-01": 119,
+            "edge-02": 15
+        },
+        "gpu_intensive": {
+            "cloud-01": 113
+        },
+        "general": {
+            "cloud-01": 116
+        },
+        "latency_sensitive": {
+            "cloud-01": 37,
+            "edge-02": 83
+        }
+    },
+    "gpu_requirement_node_selection": {
+        "gpu_not_required": {
+            "cloud-01": 370,
+            "edge-02": 102,
+            "edge-01": 1
+        },
+        "gpu_required": {
+            "cloud-01": 127
+        }
+    },
+    "gpu_required_tasks": 127,
+    "gpu_not_required_tasks": 473,
+    "episode_completion": [
+        {
+            "seed": 100,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 101,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 102,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 103,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 104,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 105,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 106,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 107,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 108,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 109,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 110,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 111,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 112,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 113,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 114,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 115,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 116,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 117,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 118,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 119,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 120,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 121,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 122,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 123,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 124,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 125,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 126,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 127,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 128,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        },
+        {
+            "seed": 129,
+            "tasks_completed": 20,
+            "expected_tasks": 20,
+            "all_tasks_completed": true
+        }
+    ],
+    "mean_simulated_execution_time": 9.193220166666666,
+    "mean_qos_score": 70.12381666666667,
+    "mean_deadline_success_rate": 0.9616666666666667,
+    "validation": {
+        "expected_tasks": 600,
+        "actual_tasks": 600,
+        "task_count_matches": true,
+        "zero_invalid_actions": true
+    }
+}

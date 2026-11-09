@@ -1,0 +1,10 @@
+metric,comparison_policy,reference_policy,comparison_mean,reference_mean,mean_paired_difference,median_paired_difference,preferred_direction,statistic,p_value,nonzero_pairs,method,holm_adjusted_p_value,significant_after_holm_at_0_05,direction_favors_comparison_policy
+mean_simulated_execution_time,Round Robin,Dynamic QoS,8.710504166666666,8.3070705,0.4034336666666665,0.40397000000000016,lower,0,1.825371456361214e-06,30,normal approximation with tie correction,5.476114369083642e-06,True,False
+mean_simulated_execution_time,Resource Only,Dynamic QoS,8.3742635,8.3070705,0.06719299999999993,0.06265000000000054,lower,6.0,1.0,18,exact sign enumeration with tied average ranks,1.0,False,False
+mean_simulated_execution_time,DQN,Dynamic QoS,8.975169666666666,8.3070705,0.6680991666666667,0.7038499999999996,lower,0,1.825371456361214e-06,30,normal approximation with tie correction,5.476114369083642e-06,True,False
+deadline_success_rate,Round Robin,Dynamic QoS,0.9566666666666667,0.9666666666666667,-0.010000000000000002,0.0,higher,3.5,0.109375,7,exact sign enumeration with tied average ranks,0.328125,False,False
+deadline_success_rate,Resource Only,Dynamic QoS,0.965,0.9666666666666667,-0.001666666666666668,0.0,higher,0,1.0,1,exact sign enumeration with tied average ranks,1.0,False,False
+deadline_success_rate,DQN,Dynamic QoS,0.9683333333333334,0.9666666666666667,0.001666666666666668,0.0,higher,0,1.0,1,exact sign enumeration with tied average ranks,1.0,False,True
+mean_qos_score,Round Robin,Dynamic QoS,72.60706666666667,74.955,-2.3479333333333328,-2.357750000000003,higher,0,1.825371456361214e-06,30,normal approximation with tie correction,5.476114369083642e-06,True,False
+mean_qos_score,Resource Only,Dynamic QoS,75.02278333333334,74.955,0.0677833333333325,0.014499999999998181,higher,0,1.0,18,exact sign enumeration with tied average ranks,1.0,False,True
+mean_qos_score,DQN,Dynamic QoS,69.53138333333334,74.955,-5.4236166666666685,-5.494750000000003,higher,0,1.825371456361214e-06,30,normal approximation with tie correction,5.476114369083642e-06,True,False

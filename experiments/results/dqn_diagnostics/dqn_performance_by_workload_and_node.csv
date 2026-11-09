@@ -1,0 +1,10 @@
+workload_type,selected_node,task_count,mean_simulated_execution_time,mean_qos_score,deadline_success_percentage
+cpu_intensive,cloud-01,119,12.0424,70.3094,99.16
+cpu_intensive,edge-02,15,9.0812,84.0907,100.0
+general,cloud-01,116,8.6754,67.283,100.0
+gpu_intensive,cloud-01,113,8.0642,62.7698,100.0
+latency_sensitive,cloud-01,37,8.3528,65.9711,48.65
+latency_sensitive,edge-02,83,3.9802,83.8613,96.39
+memory_intensive,cloud-01,112,12.015,69.1604,100.0
+memory_intensive,edge-01,1,9.0459,87.54,100.0
+memory_intensive,edge-02,4,8.7333,78.34,100.0

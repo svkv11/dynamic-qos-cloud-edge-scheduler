@@ -1,0 +1,282 @@
+{
+    "input_file": "experiments\\results\\dqn_comparison\\policy_comparison_episode_metrics.csv",
+    "matched_seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129
+    ],
+    "number_of_paired_episodes": 30,
+    "reference_policy": "Dynamic QoS",
+    "significance_level": 0.05,
+    "multiple_testing_correction": "Holm",
+    "metrics": {
+        "mean_simulated_execution_time": {
+            "Round Robin": {
+                "n": 30,
+                "mean": 8.710504166666666,
+                "population_std": 0.48151189977867864,
+                "median": 8.773545
+            },
+            "Resource Only": {
+                "n": 30,
+                "mean": 8.3742635,
+                "population_std": 0.5036989299408758,
+                "median": 8.50746
+            },
+            "Dynamic QoS": {
+                "n": 30,
+                "mean": 8.3070705,
+                "population_std": 0.4809106693059014,
+                "median": 8.3747175
+            },
+            "DQN": {
+                "n": 30,
+                "mean": 8.975169666666666,
+                "population_std": 0.5355140067323687,
+                "median": 9.0140625
+            }
+        },
+        "deadline_success_rate": {
+            "Round Robin": {
+                "n": 30,
+                "mean": 0.9566666666666667,
+                "population_std": 0.04422166387140533,
+                "median": 0.95
+            },
+            "Resource Only": {
+                "n": 30,
+                "mean": 0.965,
+                "population_std": 0.046815239683960466,
+                "median": 1.0
+            },
+            "Dynamic QoS": {
+                "n": 30,
+                "mean": 0.9666666666666667,
+                "population_std": 0.04346134936801766,
+                "median": 1.0
+            },
+            "DQN": {
+                "n": 30,
+                "mean": 0.9683333333333334,
+                "population_std": 0.03975620147292187,
+                "median": 1.0
+            }
+        },
+        "mean_qos_score": {
+            "Round Robin": {
+                "n": 30,
+                "mean": 72.60706666666667,
+                "population_std": 1.908609038599111,
+                "median": 72.63300000000001
+            },
+            "Resource Only": {
+                "n": 30,
+                "mean": 75.02278333333334,
+                "population_std": 2.2735830850712775,
+                "median": 75.57849999999999
+            },
+            "Dynamic QoS": {
+                "n": 30,
+                "mean": 74.955,
+                "population_std": 2.2722961221343208,
+                "median": 75.51500000000001
+            },
+            "DQN": {
+                "n": 30,
+                "mean": 69.53138333333334,
+                "population_std": 2.3039034401182903,
+                "median": 69.07525000000001
+            }
+        }
+    },
+    "paired_tests": [
+        {
+            "metric": "mean_simulated_execution_time",
+            "comparison_policy": "Round Robin",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 8.710504166666666,
+            "reference_mean": 8.3070705,
+            "mean_paired_difference": 0.4034336666666665,
+            "median_paired_difference": 0.40397000000000016,
+            "preferred_direction": "lower",
+            "statistic": 0,
+            "p_value": 1.825371456361214e-06,
+            "nonzero_pairs": 30,
+            "method": "normal approximation with tie correction",
+            "holm_adjusted_p_value": 5.476114369083642e-06,
+            "significant_after_holm_at_0_05": true,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "mean_simulated_execution_time",
+            "comparison_policy": "Resource Only",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 8.3742635,
+            "reference_mean": 8.3070705,
+            "mean_paired_difference": 0.06719299999999993,
+            "median_paired_difference": 0.06265000000000054,
+            "preferred_direction": "lower",
+            "statistic": 6.0,
+            "p_value": 1.0,
+            "nonzero_pairs": 18,
+            "method": "exact sign enumeration with tied average ranks",
+            "holm_adjusted_p_value": 1.0,
+            "significant_after_holm_at_0_05": false,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "mean_simulated_execution_time",
+            "comparison_policy": "DQN",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 8.975169666666666,
+            "reference_mean": 8.3070705,
+            "mean_paired_difference": 0.6680991666666667,
+            "median_paired_difference": 0.7038499999999996,
+            "preferred_direction": "lower",
+            "statistic": 0,
+            "p_value": 1.825371456361214e-06,
+            "nonzero_pairs": 30,
+            "method": "normal approximation with tie correction",
+            "holm_adjusted_p_value": 5.476114369083642e-06,
+            "significant_after_holm_at_0_05": true,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "deadline_success_rate",
+            "comparison_policy": "Round Robin",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 0.9566666666666667,
+            "reference_mean": 0.9666666666666667,
+            "mean_paired_difference": -0.010000000000000002,
+            "median_paired_difference": 0.0,
+            "preferred_direction": "higher",
+            "statistic": 3.5,
+            "p_value": 0.109375,
+            "nonzero_pairs": 7,
+            "method": "exact sign enumeration with tied average ranks",
+            "holm_adjusted_p_value": 0.328125,
+            "significant_after_holm_at_0_05": false,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "deadline_success_rate",
+            "comparison_policy": "Resource Only",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 0.965,
+            "reference_mean": 0.9666666666666667,
+            "mean_paired_difference": -0.001666666666666668,
+            "median_paired_difference": 0.0,
+            "preferred_direction": "higher",
+            "statistic": 0,
+            "p_value": 1.0,
+            "nonzero_pairs": 1,
+            "method": "exact sign enumeration with tied average ranks",
+            "holm_adjusted_p_value": 1.0,
+            "significant_after_holm_at_0_05": false,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "deadline_success_rate",
+            "comparison_policy": "DQN",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 0.9683333333333334,
+            "reference_mean": 0.9666666666666667,
+            "mean_paired_difference": 0.001666666666666668,
+            "median_paired_difference": 0.0,
+            "preferred_direction": "higher",
+            "statistic": 0,
+            "p_value": 1.0,
+            "nonzero_pairs": 1,
+            "method": "exact sign enumeration with tied average ranks",
+            "holm_adjusted_p_value": 1.0,
+            "significant_after_holm_at_0_05": false,
+            "direction_favors_comparison_policy": true
+        },
+        {
+            "metric": "mean_qos_score",
+            "comparison_policy": "Round Robin",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 72.60706666666667,
+            "reference_mean": 74.955,
+            "mean_paired_difference": -2.3479333333333328,
+            "median_paired_difference": -2.357750000000003,
+            "preferred_direction": "higher",
+            "statistic": 0,
+            "p_value": 1.825371456361214e-06,
+            "nonzero_pairs": 30,
+            "method": "normal approximation with tie correction",
+            "holm_adjusted_p_value": 5.476114369083642e-06,
+            "significant_after_holm_at_0_05": true,
+            "direction_favors_comparison_policy": false
+        },
+        {
+            "metric": "mean_qos_score",
+            "comparison_policy": "Resource Only",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 75.02278333333334,
+            "reference_mean": 74.955,
+            "mean_paired_difference": 0.0677833333333325,
+            "median_paired_difference": 0.014499999999998181,
+            "preferred_direction": "higher",
+            "statistic": 0,
+            "p_value": 1.0,
+            "nonzero_pairs": 18,
+            "method": "exact sign enumeration with tied average ranks",
+            "holm_adjusted_p_value": 1.0,
+            "significant_after_holm_at_0_05": false,
+            "direction_favors_comparison_policy": true
+        },
+        {
+            "metric": "mean_qos_score",
+            "comparison_policy": "DQN",
+            "reference_policy": "Dynamic QoS",
+            "comparison_mean": 69.53138333333334,
+            "reference_mean": 74.955,
+            "mean_paired_difference": -5.4236166666666685,
+            "median_paired_difference": -5.494750000000003,
+            "preferred_direction": "higher",
+            "statistic": 0,
+            "p_value": 1.825371456361214e-06,
+            "nonzero_pairs": 30,
+            "method": "normal approximation with tie correction",
+            "holm_adjusted_p_value": 5.476114369083642e-06,
+            "significant_after_holm_at_0_05": true,
+            "direction_favors_comparison_policy": false
+        }
+    ],
+    "interpretation_notes": [
+        "Tests use matched episode-level values for the same seeds.",
+        "The reference policy is Dynamic QoS.",
+        "Execution time differences are comparison minus reference; negative favors the comparison policy.",
+        "Deadline success and QoS differences are comparison minus reference; positive favors the comparison policy.",
+        "These are simulated outcomes, not real-world measurements.",
+        "Statistical significance does not by itself establish practical importance or real-world superiority."
+    ]
+}

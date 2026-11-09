@@ -1,0 +1,75 @@
+{
+    "checkpoint": "experiments\\results\\dqn\\dqn_model.pt",
+    "training_episodes_in_checkpoint": 1000,
+    "training_seed_in_checkpoint": 42,
+    "evaluation_seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129
+    ],
+    "evaluation_episodes": 30,
+    "expected_tasks_per_episode": 20,
+    "total_tasks_completed": 600,
+    "all_episodes_completed": true,
+    "metrics_are_simulated": true,
+    "policy_uses_exploration": false,
+    "invalid_actions_total": 0,
+    "episode_metrics": {
+        "tasks_completed": {
+            "mean": 20.0,
+            "population_std": 0.0
+        },
+        "total_reward": {
+            "mean": 177.35641333333334,
+            "population_std": 13.731477649710135
+        },
+        "mean_reward_per_task": {
+            "mean": 8.867820666666667,
+            "population_std": 0.6865738824855068
+        },
+        "mean_simulated_execution_time": {
+            "mean": 9.193220166666666,
+            "population_std": 0.7840295103199063
+        },
+        "deadline_success_rate": {
+            "mean": 0.9616666666666667,
+            "population_std": 0.033374973990834646
+        },
+        "mean_qos_score": {
+            "mean": 70.12381666666667,
+            "population_std": 1.6071700723286533
+        }
+    },
+    "node_selection_counts": {
+        "edge-01": 1,
+        "edge-02": 102,
+        "cloud-01": 497
+    }
+}

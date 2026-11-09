@@ -1,0 +1,206 @@
+{
+    "checkpoint": "experiments\\results\\dqn\\dqn_model.pt",
+    "training_episodes_in_checkpoint": 1000,
+    "training_seed_in_checkpoint": 42,
+    "evaluation_seeds": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129
+    ],
+    "policies": [
+        "Round Robin",
+        "Resource Only",
+        "Dynamic QoS",
+        "DQN"
+    ],
+    "tasks_per_episode": 20,
+    "episodes_per_policy": 30,
+    "metrics_are_simulated": true,
+    "execution_time_is_wall_clock": false,
+    "same_seeded_task_generation_per_policy": true,
+    "policy_exploration_enabled_for_dqn": false,
+    "episode_summary": {
+        "Round Robin": {
+            "tasks_completed": {
+                "mean": 20.0,
+                "population_std": 0.0
+            },
+            "total_reward": {
+                "mean": 181.00189666666665,
+                "population_std": 17.688170869001375
+            },
+            "mean_reward_per_completed_task": {
+                "mean": 9.050094833333333,
+                "population_std": 0.8844085434500687
+            },
+            "mean_simulated_execution_time": {
+                "mean": 8.710504166666666,
+                "population_std": 0.48151189977867864
+            },
+            "deadline_success_rate": {
+                "mean": 0.9566666666666667,
+                "population_std": 0.04422166387140533
+            },
+            "mean_qos_score": {
+                "mean": 72.60706666666667,
+                "population_std": 1.908609038599111
+            },
+            "invalid_actions_or_unscheduled": {
+                "mean": 0.0,
+                "population_std": 0.0
+            }
+        },
+        "Resource Only": {
+            "tasks_completed": {
+                "mean": 20.0,
+                "population_std": 0.0
+            },
+            "total_reward": {
+                "mean": 187.42358,
+                "population_std": 19.89774876090928
+            },
+            "mean_reward_per_completed_task": {
+                "mean": 9.371179,
+                "population_std": 0.9948874380454642
+            },
+            "mean_simulated_execution_time": {
+                "mean": 8.3742635,
+                "population_std": 0.5036989299408758
+            },
+            "deadline_success_rate": {
+                "mean": 0.965,
+                "population_std": 0.046815239683960466
+            },
+            "mean_qos_score": {
+                "mean": 75.02278333333334,
+                "population_std": 2.2735830850712775
+            },
+            "invalid_actions_or_unscheduled": {
+                "mean": 0.0,
+                "population_std": 0.0
+            }
+        },
+        "Dynamic QoS": {
+            "tasks_completed": {
+                "mean": 20.0,
+                "population_std": 0.0
+            },
+            "total_reward": {
+                "mean": 188.93067,
+                "population_std": 18.456085733133307
+            },
+            "mean_reward_per_completed_task": {
+                "mean": 9.4465335,
+                "population_std": 0.9228042866566654
+            },
+            "mean_simulated_execution_time": {
+                "mean": 8.3070705,
+                "population_std": 0.4809106693059014
+            },
+            "deadline_success_rate": {
+                "mean": 0.9666666666666667,
+                "population_std": 0.04346134936801766
+            },
+            "mean_qos_score": {
+                "mean": 74.955,
+                "population_std": 2.2722961221343208
+            },
+            "invalid_actions_or_unscheduled": {
+                "mean": 0.0,
+                "population_std": 0.0
+            }
+        },
+        "DQN": {
+            "tasks_completed": {
+                "mean": 20.0,
+                "population_std": 0.0
+            },
+            "total_reward": {
+                "mean": 179.78108,
+                "population_std": 16.282321438386283
+            },
+            "mean_reward_per_completed_task": {
+                "mean": 8.989054,
+                "population_std": 0.814116071919314
+            },
+            "mean_simulated_execution_time": {
+                "mean": 8.975169666666666,
+                "population_std": 0.5355140067323687
+            },
+            "deadline_success_rate": {
+                "mean": 0.9683333333333334,
+                "population_std": 0.03975620147292187
+            },
+            "mean_qos_score": {
+                "mean": 69.53138333333334,
+                "population_std": 2.3039034401182903
+            },
+            "invalid_actions_or_unscheduled": {
+                "mean": 0.0,
+                "population_std": 0.0
+            }
+        }
+    },
+    "node_selection_counts": {
+        "Round Robin": {
+            "edge-01": 64,
+            "edge-02": 165,
+            "cloud-01": 371
+        },
+        "Resource Only": {
+            "edge-01": 49,
+            "edge-02": 238,
+            "cloud-01": 313
+        },
+        "Dynamic QoS": {
+            "edge-01": 51,
+            "edge-02": 258,
+            "cloud-01": 291
+        },
+        "DQN": {
+            "edge-01": 1,
+            "edge-02": 89,
+            "cloud-01": 510
+        }
+    },
+    "notes": [
+        "All policy outcomes use DQNCloudEdgeEnvironment.",
+        "Round Robin and Resource Only follow the existing baseline selection definitions.",
+        "Dynamic QoS uses QoSScheduler in full mode.",
+        "Dynamic QoS deadline ranking uses TaskExecutor estimates, while outcomes use the environment's execution-time formula.",
+        "Results should be interpreted as a comparison under the shared simulator, not real-world execution measurements."
+    ],
+    "all_episodes_completed": {
+        "Round Robin": true,
+        "Resource Only": true,
+        "Dynamic QoS": true,
+        "DQN": true
+    }
+}
